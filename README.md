@@ -13,6 +13,11 @@ Application web installable (PWA), sans serveur ni compte : les données restent
 - **Fonds PMB** : signale les livres déjà possédés, au scan et/ou avant l'envoi (adresse du connecteur dans Réglages).
 - **Envoi** : tableau HTML partagé vers la messagerie, ou texte simple ; les livres envoyés sont masqués mais toujours reconnus au scan.
 
+## Format du mail
+L'outil d'acquisitions de la bibliothèque lit ce mail : ne pas changer ce format sans adapter son lecteur (`veille.py`).
+- **Corps** : une ligne par livre, `• [Priorité] — ISBN — Titre : … — Auteur : … — …`, chaque champ précédé de son nom (`label` de `config.js`), les champs vides omis.
+- **Pièce jointe** `veille-acquisitions-AAAA-MM-JJ.html` : chaque ligne du tableau porte les champs du livre en JSON dans son attribut `data-veille` (`isbn`, `priorite`, puis les `id` de `config.js`).
+
 ## Configuration
 Tout se règle dans `config.js` : champs, cotes, motifs, taille des photos, adresse BnF (ou d'un relais), méthode PMB.
 Le destinataire du mail et l'adresse PMB se saisissent dans l'application.

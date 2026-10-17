@@ -27,6 +27,13 @@ function formaterPoids(n) {
   return n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " Mo" : Math.max(1, Math.round(n / 1024)) + " Ko";
 }
 
+// Date du jour en heure locale (AAAA-MM-JJ), pour les noms de fichiers.
+// toISOString donnerait la date UTC, donc celle de la veille entre minuit et 2 h en été.
+function dateFichier() {
+  const d = new Date();
+  return [d.getFullYear(), d.getMonth() + 1, d.getDate()].map((n) => String(n).padStart(2, "0")).join("-");
+}
+
 function formaterDate(ts) {
   const d = new Date(ts), n = new Date();
   const hm = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
@@ -218,6 +225,9 @@ function urlCouvertureBnf(ark) {
   return `${CONFIG.bnf.base}/couverture?&appName=NE&idArk=${encodeURIComponent(ark)}&couverture=1`;
 }
 
+// Adresse de la couverture BnF du livre, ou "" (pas de notice, ou pas d'image à la BnF).
+const couvBnf = (l) => (l.cover && l.bnfData?.ark ? urlCouvertureBnf(l.bnfData.ark) : "");
+
 // Renvoie { statut: "found" | "notfound" | "error", data? }.
 async function interrogerBnf(isbn) {
   const requete = `bib.isbn adj "${isbn}"`;
@@ -226,10 +236,8 @@ async function interrogerBnf(isbn) {
     `&query=${encodeURIComponent(requete)}&recordSchema=unimarcxchange&maximumRecords=1`;
   let texte;
   try {
-    const ctrl = new AbortController();
-    const minuterie = setTimeout(() => ctrl.abort(), 15000);
-    const r = await fetch(url, { signal: ctrl.signal });
-    clearTimeout(minuterie);
+    // Le délai court jusqu'à la fin de la lecture de la réponse, pas seulement jusqu'aux en-têtes.
+    const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
     if (!r.ok) return { statut: "error" };
     texte = await r.text();
   } catch {
@@ -305,22 +313,16 @@ function testerCouverture(url) {
 // ---------- PMB : connecteur sortant JSON-RPC ----------
 
 async function appelPmb(url, methode, params) {
-  const ctrl = new AbortController();
-  const m = setTimeout(() => ctrl.abort(), 12000);
-  try {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", method: methode, params, id: Date.now() }),
-      signal: ctrl.signal,
-    });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    const j = await r.json();
-    if (j.error) throw new Error(j.error.message || "Erreur PMB");
-    return j.result;
-  } finally {
-    clearTimeout(m);
-  }
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", method: methode, params, id: Date.now() }),
+    signal: AbortSignal.timeout(12000),
+  });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const j = await r.json();
+  if (j.error) throw new Error(j.error.message || "Erreur PMB");
+  return j.result;
 }
 
 // Renvoie { fonds: true/false, info } ou null si la vérification est impossible.
@@ -342,7 +344,8 @@ async function testerPmb(url) {
     await appelPmb(url, CONFIG.pmb.methode, [CONFIG.pmb.typeRecherche, "9782070360024"]);
     return "ok";
   } catch (e) {
-    return e instanceof TypeError ? "unreachable" : "refused";
+    // Pas de réponse dans le délai : serveur injoignable, pas un refus.
+    return e instanceof TypeError || e.name === "TimeoutError" ? "unreachable" : "refused";
   }
 }
 
@@ -353,10 +356,12 @@ function sousLigneMail(l) {
   return [f.auteur, f.editeur, f.cote, f.motif, f.prix, f.commentaire].filter(Boolean).join(" · ");
 }
 
+// Une ligne par livre, chaque champ précédé de son nom : l'outil d'acquisitions (veille.py)
+// sait ainsi lequel manque, au lieu de le deviner à sa place dans la ligne.
 function corpsTexte(livres) {
   const lignes = livres.map((l) => {
     const parts = [`[${PRIO[l.prio]}]`, l.isbn ? formaterIsbn(l.isbn) : "(sans ISBN)"];
-    for (const c of CHAMPS) if (l.fields[c.id]) parts.push(c.toujours ? l.fields[c.id] : `${c.label} : ${l.fields[c.id]}`);
+    for (const c of CHAMPS) if (l.fields[c.id]) parts.push(`${c.label} : ${String(l.fields[c.id]).replace(/\s+/g, " ")}`);
     return "• " + parts.join(" — ");
   });
   const n = livres.length;
@@ -399,21 +404,29 @@ function codeBarresSvg(isbn) {
 
 const COULEURS_PRIO_MAIL = { 1: ["#a9c4e6", "#14181d"], 2: ["#3f78b5", "#fff"], 3: ["#173f74", "#fff"] };
 
+// Champs du livre, portés par sa ligne du tableau (attribut data-veille, invisible) :
+// l'outil d'acquisitions les lit tels quels.
+function donneesLivre(l) {
+  const d = { isbn: l.isbn || "", priorite: PRIO[l.prio] };
+  for (const c of CHAMPS) if (l.fields[c.id]) d[c.id] = l.fields[c.id];
+  return d;
+}
+
 // Tableau HTML autonome : photos intégrées (réduites), couvertures BnF en lien.
 async function documentHtml(livres) {
   const n = livres.length;
-  const avecCouv = livres.some((l) => !l.photo && l.cover && l.bnfData?.ark);
+  const avecCouv = livres.some((l) => !l.photo && couvBnf(l));
   const lignes = [];
   for (const l of livres) {
     let vignette = `<div style="width:60px;height:88px;border:1px dashed #c5ccd4;border-radius:3px"></div>`;
     if (l.photo) {
       const b = await photos.get(l.id);
       if (b) vignette = `<img src="${await blobEnDataUrl(b)}" alt="" width="60" style="border-radius:3px;display:block">`;
-    } else if (l.cover && l.bnfData?.ark) {
-      vignette = `<img src="${esc(urlCouvertureBnf(l.bnfData.ark))}" alt="" width="60" style="border-radius:3px;display:block">`;
+    } else if (couvBnf(l)) {
+      vignette = `<img src="${esc(couvBnf(l))}" alt="" width="60" style="border-radius:3px;display:block">`;
     }
     const [fond, encre] = COULEURS_PRIO_MAIL[l.prio];
-    lignes.push(`<tr>
+    lignes.push(`<tr data-veille="${esc(JSON.stringify(donneesLivre(l)))}">
 <td style="padding:8px;border-bottom:1px solid #eceff2;vertical-align:top">${vignette}</td>
 <td style="padding:8px;border-bottom:1px solid #eceff2;vertical-align:top;font-size:14px;line-height:1.4">
 <b style="font-size:15px">${esc(l.fields.titre || "(titre à compléter)")}</b><br>
@@ -457,7 +470,7 @@ function fichierCsv(livres) {
     );
   }
   // BOM pour qu'Excel/LibreOffice reconnaissent l'UTF-8.
-  return new File(["﻿" + lignes.join("\r\n")], `veille-isbn-${new Date().toISOString().slice(0, 10)}.csv`, { type: "text/csv" });
+  return new File(["﻿" + lignes.join("\r\n")], `veille-isbn-${dateFichier()}.csv`, { type: "text/csv" });
 }
 
 async function partagerOuTelecharger(fichier, titre) {

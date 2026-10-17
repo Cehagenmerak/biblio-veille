@@ -58,11 +58,15 @@ function toast(msg) {
   toast.m = setTimeout(() => (t.hidden = true), 2200);
 }
 
+function vibrer(motif) {
+  try {
+    navigator.vibrate?.(motif);
+  } catch {}
+}
+
 let audio = null;
 function bip(double) {
-  try {
-    navigator.vibrate && navigator.vibrate(double ? [40, 60, 40] : 60);
-  } catch {}
+  vibrer(double ? [40, 60, 40] : 60);
   try {
     audio = audio || new (window.AudioContext || window.webkitAudioContext)();
     const son = (f, t) => {
@@ -218,8 +222,10 @@ function vueListe() {
     }
     for (const s of sessions) h += tete(libelleSession(s), s.length) + s.map(vueLigne).join("");
   } else if (R.groupe === "public") {
+    // Un public absent de config.js (liste modifiée depuis) va avec les non renseignés, sinon le livre disparaîtrait.
+    const publicDe = (l) => (PUBLICS.includes(l.fields.public) ? l.fields.public : "");
     for (const pu of [...PUBLICS, ""]) {
-      const items = vis.filter((l) => (l.fields.public || "") === pu);
+      const items = vis.filter((l) => publicDe(l) === pu);
       if (items.length) h += tete(pu || "Public non renseigné", items.length) + items.map(vueLigne).join("");
     }
   } else h += vis.map(vueLigne).join("");
@@ -284,9 +290,7 @@ document.addEventListener("pointerdown", (e) => {
     setTimeout(() => (ignorerClic = false), 600);
     E.sel = E.sel || new Set();
     E.sel.add(id);
-    try {
-      navigator.vibrate && navigator.vibrate(20);
-    } catch {}
+    vibrer(20);
     render();
   }, 450);
 });
@@ -342,9 +346,7 @@ function finGeste() {
     const np = g.dx > 0 ? Math.min(3, l.prio + 1) : Math.max(1, l.prio - 1);
     if (np !== l.prio) {
       maj(l.id, (x) => (x.prio = np));
-      try {
-        navigator.vibrate && navigator.vibrate(15);
-      } catch {}
+      vibrer(15);
     }
   }
   g.el.classList.remove("glisse");
@@ -423,11 +425,11 @@ function vueFiche() {
     etat === "found" && l.bnfData ? esc(detailsBnf(l.bnfData)) : ""
   }</div>`;
   if (etat === "found") {
-    const ok = !!l.cover && l.bnfData?.ark;
+    const couv = couvBnf(l);
     h += `<div class="couv-ligne">${
-      ok ? `<img class="couv-img" src="${esc(urlCouvertureBnf(l.bnfData.ark))}" alt="Couverture BnF">` : `<div class="couv-vide"></div>`
-    }<div class="couv-txt"><b>${ok ? "Couverture BnF récupérée" : "Pas de couverture à la BnF"}</b><span>${
-      ok ? (l.photo ? "Votre photo est prioritaire dans le mail." : "Affichée en vignette dans le mail, en lien (0 Ko).") : "Fréquent pour une parution récente. Prenez une photo ci-dessus."
+      couv ? `<img class="couv-img" src="${esc(couv)}" alt="Couverture BnF">` : `<div class="couv-vide"></div>`
+    }<div class="couv-txt"><b>${couv ? "Couverture BnF récupérée" : "Pas de couverture à la BnF"}</b><span>${
+      couv ? (l.photo ? "Votre photo est prioritaire dans le mail." : "Affichée en vignette dans le mail, en lien (0 Ko).") : "Fréquent pour une parution récente. Prenez une photo ci-dessus."
     }</span></div></div>`;
   }
   h += `</div>`;
@@ -663,7 +665,7 @@ function vueEnvoi(f) {
   }
   h += `<div class="segments" style="grid-template-columns:1fr 1fr">${seg(html, "formatMail", "Tableau HTML", 'data-v="html"')}${seg(!html, "formatMail", "Texte simple", 'data-v="text"')}</div>`;
 
-  const nCouv = eff.filter((l) => !l.photo && l.cover && l.bnfData?.ark).length;
+  const nCouv = eff.filter((l) => !l.photo && couvBnf(l)).length;
   const avecPhoto = eff.filter((l) => l.photo);
   const poidsPhotos = avecPhoto.reduce((t, l) => t + Math.round(l.photo.size * 1.37), 0);
   const partPhotos = avecPhoto.length ? `${avecPhoto.length} photo${pl(avecPhoto.length)} ≈ ${formaterPoids(poidsPhotos)}` : "aucune photo";
@@ -675,7 +677,7 @@ function vueEnvoi(f) {
           if (l.photo) {
             const u = photos.url(l.id, renderFeuille);
             v = u ? `<img class="apercu-couv" src="${u}" alt="">` : `<div class="apercu-couv"></div>`;
-          } else if (l.cover && l.bnfData?.ark) v = `<img class="apercu-couv" src="${esc(urlCouvertureBnf(l.bnfData.ark))}" alt="">`;
+          } else if (couvBnf(l)) v = `<img class="apercu-couv" src="${esc(couvBnf(l))}" alt="">`;
           const [fond, encre] = COULEURS_PRIO_MAIL[l.prio];
           return `<div class="apercu-ligne">${v}<div class="apercu-livre"><b>${esc(l.fields.titre || "(titre à compléter)")}</b><div>${esc(sousLigneMail(l))}</div><div class="mono">${esc(
             l.isbn ? formaterIsbn(l.isbn) : "sans ISBN"
@@ -718,7 +720,7 @@ async function preparerDocument() {
   if (!eff.length) return;
   const html = await documentHtml(eff);
   if (E.feuille !== f || f.jeton !== jeton) return;
-  f.document = new File([html], `veille-acquisitions-${new Date().toISOString().slice(0, 10)}.html`, { type: "text/html" });
+  f.document = new File([html], `veille-acquisitions-${dateFichier()}.html`, { type: "text/html" });
   renderFeuille();
 }
 
@@ -1180,6 +1182,7 @@ window.addEventListener("popstate", () => {
     renderFeuille();
   } else if (!$("scanner").hidden) fermerScan();
   else if (E.ecran === "fiche" && livre(E.ficheId)?.draft) annulerBrouillon();
+  else if (E.ecran === "fiche") quitterFiche();
   else if (E.ecran !== "liste") E.ecran = "liste";
   else if (E.sel) E.sel = null;
   if ($("scanner").hidden) render();
@@ -1189,9 +1192,24 @@ window.addEventListener("popstate", () => {
 // ---------- Actions ----------
 
 function annulerBrouillon() {
-  livres = livres.filter((l) => l.id !== E.ficheId);
+  supprimerLivres([E.ficheId]); // et sa photo, sinon elle resterait dans le téléphone
   E.ecran = "liste";
   E.ficheId = null;
+}
+
+// Ce qui empêche d'enregistrer la fiche telle quelle, ou null.
+function erreurFiche(l) {
+  if (!l.isbn && !(l.fields.titre || "").trim()) return "Indiquez au moins un titre ou un ISBN.";
+  if (l.isbn && !isbnValide(l.isbn)) return "ISBN invalide : 13 chiffres commençant par 978 ou 979.";
+  if (l.isbn && livres.some((x) => x !== l && !x.draft && x.isbn === l.isbn)) return "Cet ISBN est déjà dans la liste.";
+  return null;
+}
+
+// Retour à la liste. Un livre saisi à la main garde son ISBN modifiable : il doit rester valide et unique.
+function quitterFiche() {
+  const l = livre(E.ficheId);
+  if (l?.manual && (E.ficheErr = erreurFiche(l))) return;
+  Object.assign(E, { ecran: "liste", ficheId: null, ficheErr: null });
 }
 
 const ACTIONS = {
@@ -1306,7 +1324,7 @@ const ACTIONS = {
   },
 
   // Fiche
-  ficheRetour: () => ((E.ecran = "liste"), (E.ficheId = null)),
+  ficheRetour: quitterFiche,
   ficheAnnuler: annulerBrouillon,
   ficheSuppr: () => {
     supprimerLivres([E.ficheId]);
@@ -1316,9 +1334,7 @@ const ACTIONS = {
   },
   ficheEnregistrer: () => {
     const l = livre(E.ficheId);
-    if (!l.isbn && !(l.fields.titre || "").trim()) return (E.ficheErr = "Indiquez au moins un titre ou un ISBN.");
-    if (l.isbn && !isbnValide(l.isbn)) return (E.ficheErr = "ISBN invalide : 13 chiffres commençant par 978 ou 979.");
-    if (l.isbn && livres.some((x) => x !== l && !x.draft && x.isbn === l.isbn)) return (E.ficheErr = "Cet ISBN est déjà dans la liste.");
+    if ((E.ficheErr = erreurFiche(l))) return;
     l.draft = false;
     l.ts = Date.now();
     sauver();
@@ -1461,8 +1477,20 @@ document.addEventListener("input", (e) => {
     const v = el.value.replace(/[^0-9]/g, "").slice(0, 13);
     if (v !== el.value) el.value = v;
     const l = livre(E.ficheId);
-    l.isbn = v;
-    l.bnf = v ? "none" : "na";
+    if (v === l.isbn) return;
+    // Autre ISBN : ce que la BnF et PMB disaient du précédent ne vaut plus (titre, couverture, « Au fonds »).
+    // Les champs remplis par la BnF sont vidés, à l'écran aussi ; les saisies restent.
+    for (const k of Object.keys(l.src)) {
+      if (l.src[k] !== "bnf") continue;
+      delete l.fields[k];
+      delete l.src[k];
+      const champ = $("f-" + k);
+      if (champ) {
+        champ.value = "";
+        champ.closest(".bloc").querySelector(".tag-bnf")?.remove();
+      }
+    }
+    Object.assign(l, { isbn: v, bnf: v ? "none" : "na", bnfData: null, cover: null, fonds: null, fondsInfo: null, dismissed: {} });
     if (!l.draft) sauver();
   } else if (i === "isbnTape") {
     const v = el.value.replace(/[^0-9]/g, "").slice(0, 13);
