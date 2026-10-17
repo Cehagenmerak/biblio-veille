@@ -1,5 +1,7 @@
-# veille-isbn
-Petite appli de lecture d'ISBN sur le terrain pour veille bibliographique.
+# Biblio' Veille
+Petite appli de lecture d'ISBN sur le terrain pour veille bibliographique. Elle fait partie de l'outil de préparation des acquisitions de la bibliothèque de Parçay-Meslay et partage le style de Biblio' Tour (nom, logo « B.V »).
+
+Ancien nom : Veille ISBN. Le mail envoyé garde l'objet « Veille acquisitions » et la pièce `veille-acquisitions-AAAA-MM-JJ.html`, que `collecter.py` et `veille.py` reconnaissent : ne pas les renommer sans modifier ces scripts. Les clés de stockage du téléphone gardent le préfixe `veille-isbn:` pour la même raison (les fiches existantes restent lisibles).
 
 Application web installable (PWA), sans serveur ni compte : les données restent sur le téléphone.
 

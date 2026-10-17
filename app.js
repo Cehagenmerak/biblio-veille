@@ -155,7 +155,7 @@ function vueListe() {
   if (!sel) {
     h += `<div class="entete">
       <div class="entete-l1">
-        <div class="logo"><div class="logo-icone"><i style="width:2px"></i><i style="width:4px"></i><i style="width:2px"></i><i style="width:3px"></i></div><div class="logo-titre">Veille ISBN</div></div>
+        <div class="logo"><div class="logo-icone" aria-hidden="true">B<b>.</b>V</div><div class="logo-titre">Biblio' Veille</div></div>
         <button class="btn-reglages" data-a="reglages">Réglages</button>
       </div>
       <div class="compteur"><span class="compteur-n">${nonEnvoyes.length}</span><span class="compteur-l">à envoyer</span><span class="compteur-t">/ ${tous.length} au total</span></div>
@@ -1235,7 +1235,7 @@ const ACTIONS = {
   csv: () => {
     const tous = visibles();
     if (!tous.length) return toast("Liste vide."), false;
-    partagerOuTelecharger(fichierCsv(tous), "Veille ISBN");
+    partagerOuTelecharger(fichierCsv(tous), "Biblio' Veille");
     return false;
   },
   fermerFeuille: () => {

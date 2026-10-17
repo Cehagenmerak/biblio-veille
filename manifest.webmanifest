@@ -1,12 +1,12 @@
 {
-  "name": "Veille ISBN",
-  "short_name": "Veille ISBN",
+  "name": "Biblio' Veille",
+  "short_name": "Biblio' Veille",
   "description": "Scanner les ISBN de livres repérés et les envoyer à la bibliothèque.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#1f4e79",
+  "background_color": "#1a1714",
   "theme_color": "#1f4e79",
   "icons": [
     {

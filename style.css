@@ -93,8 +93,8 @@ button:disabled { cursor: default; }
 .entete { background: var(--head); color: #fff; padding: calc(14px + env(safe-area-inset-top)) 16px 18px; }
 .entete-l1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .logo { display: flex; align-items: center; gap: 10px; }
-.logo-icone { width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 6px; }
-.logo-icone i { display: block; height: 16px; background: #1f4e79; }
+.logo-icone { width: 32px; height: 32px; border-radius: 8px; background: #1a1714; color: #f6f3ec; display: flex; align-items: center; justify-content: center; font: 600 15px/1 Newsreader, "Source Serif 4", Georgia, serif; letter-spacing: -.02em; }
+.logo-icone b { color: #d9573a; font-weight: 700; }
 .logo-titre { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
 .btn-reglages { min-height: 48px; padding: 0 14px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; border-radius: 10px; font-size: 15px; font-weight: 600; }
 .compteur { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }

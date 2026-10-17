@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Biblio' Veille</title>
+  <rect width="512" height="512" rx="112" fill="#1a1714"/>
+  <g font-family="Newsreader, 'Source Serif 4', Georgia, 'Times New Roman', serif" font-size="228" fill="#f6f3ec">
+    <text x="82" y="330">B</text>
+    <text x="438" y="330" text-anchor="end">V</text>
+  </g>
+  <circle cx="261" cy="317" r="12.5" fill="#d9573a"/>
+</svg>
