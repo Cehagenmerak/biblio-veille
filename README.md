@@ -1,5 +1,5 @@
 # Biblio' Veille
-Petite appli de lecture d'ISBN sur le terrain pour veille bibliographique. Elle fait partie de l'outil de préparation des acquisitions de la bibliothèque de Parçay-Meslay et partage le style de Biblio' Tour (nom, logo « B.V »).
+Petite appli de lecture d'ISBN sur le terrain pour veille bibliographique. Elle fait partie de l'outil de préparation des acquisitions de la bibliothèque de Parçay-Meslay et porte l'identité de la famille Biblio' (18 octobre 2026) : jetons communs `biblio-jetons.css` et bascule `biblio-theme.js`, copiés depuis `projets/charte-graphique-bibliotheque/harmonisation/kit/`, en-tête type avec la tuile de Veille.
 
 Ancien nom : Veille ISBN. Le mail envoyé garde l'objet « Veille acquisitions » et la pièce `veille-acquisitions-AAAA-MM-JJ.html`, que `collecter.py` et `veille.py` reconnaissent : ne pas les renommer sans modifier ces scripts. Les clés de stockage du téléphone gardent le préfixe `veille-isbn:` pour la même raison (les fiches existantes restent lisibles).
 
@@ -22,7 +22,7 @@ L'outil d'acquisitions de la bibliothèque lit ce mail : ne pas changer ce forma
 Tout se règle dans `config.js` : champs, cotes, motifs, taille des photos, adresse BnF (ou d'un relais), méthode PMB.
 Le destinataire du mail et l'adresse PMB se saisissent dans l'application.
 
-Après chaque modification des fichiers, changer `VERSION` dans `sw.js` pour forcer la mise à jour sur le téléphone.
+Après chaque modification des fichiers, changer `VERSION` dans `sw.js` (et `VERSION_APP` dans `config.js`, le même numéro) pour forcer la mise à jour sur le téléphone, avec une entrée dans `CHANGELOG.md`. Numérotation SemVer (MAJEUR.MINEUR.CORRECTIF), comme Biblio' Tour ; le numéro s'affiche en bas de Réglages.
 
 ## Licences
 ZXing (`vendor/`) : Apache 2.0. Polices IBM Plex Sans, Libre Bodoni et Atkinson Hyperlegible Mono (`vendor/fonts/`) : SIL OFL 1.1.

@@ -1,10 +1,13 @@
 // Cache de l'application pour qu'elle fonctionne hors ligne.
-// Changer VERSION à chaque modification des fichiers pour forcer la mise à jour.
-const VERSION = "v13";
+// VERSION : numéro SemVer (voir CHANGELOG.md), le même que VERSION_APP dans config.js.
+// Le changer à chaque modification des fichiers pour forcer la mise à jour.
+const VERSION = "1.0.0";
 const CACHE = "biblio-veille-" + VERSION;
 const FICHIERS = [
   "./",
   "index.html",
+  "biblio-jetons.css",
+  "biblio-theme.js",
   "style.css",
   "config.js",
   "services.js",
@@ -22,6 +25,7 @@ const FICHIERS = [
   "apple-touch-icon.png",
   "favicon-32.png",
   "favicon-16.png",
+  "tuile-128.png",
 ];
 
 self.addEventListener("install", (e) => {

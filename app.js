@@ -39,13 +39,20 @@ function supprimerLivres(ids) {
 
 // ---------- Thème ----------
 
+// Le choix clair / sombre est celui de la famille Biblio' (biblio-theme.js, clé « biblio-theme ») :
+// le bouton de l'en-tête et les Réglages écrivent au même endroit. Un ancien choix des Réglages
+// (R.theme : light / dark) est repris une fois, puis oublié.
 function appliquerTheme() {
-  const html = document.documentElement;
-  if (R.theme) html.dataset.theme = R.theme;
-  else delete html.dataset.theme;
+  if (!R.theme) return;
+  const t = R.theme === "dark" ? "sombre" : "clair";
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("biblio-theme", t); } catch (e) {}
+  delete R.theme;
+  sauverR();
 }
 function themeSombre() {
-  return R.theme ? R.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const t = document.documentElement.dataset.theme;
+  return t ? t === "sombre" : matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
 // ---------- Retours : message, bip, vibration ----------
@@ -158,10 +165,10 @@ function vueListe() {
 
   if (!sel) {
     h += `<div class="entete">
-      <div class="entete-l1">
-        <div class="logo"><div class="logo-icone" aria-hidden="true">B<b>.</b>V</div><div class="logo-titre">Biblio' Veille</div></div>
-        <button class="btn-reglages" data-a="reglages">Réglages</button>
-      </div>
+      <header class="b-entete">
+        <div class="b-marque"><img src="tuile-128.png" alt=""><span class="b-marque-texte"><span class="b-marque-biblio">Biblio’</span><span class="b-marque-appli">Veille</span></span></div>
+        <div class="b-entete-actions"><button class="btn-reglages" data-a="reglages">Réglages</button><button class="b-bascule" type="button"></button></div>
+      </header>
       <div class="compteur"><span class="compteur-n">${nonEnvoyes.length}</span><span class="compteur-l">à envoyer</span><span class="compteur-t">/ ${tous.length} au total</span></div>
     </div>
     <div class="actions">
@@ -547,6 +554,7 @@ function vueReglages() {
       <div class="note">Les listes de choix se modifient dans le fichier config.js.</div>
     </div>
     <div class="note">${n} livre${pl(n)} enregistré${pl(n)} sur le téléphone · aucun compte, aucun serveur.</div>
+    <div class="note">Biblio' Veille ${VERSION_APP}</div>
   </div></div>`;
 }
 
@@ -1389,7 +1397,6 @@ const ACTIONS = {
   },
   theme: (el) => {
     R.theme = el.dataset.v;
-    sauverR();
     appliquerTheme();
   },
   favori: (el) => {

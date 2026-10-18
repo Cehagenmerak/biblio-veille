@@ -1,0 +1,183 @@
+/* Biblio' : jetons communs, niveau A (identité). Version finale du 18 octobre 2026.
+   Fichier à COPIER dans chaque appli, avec le dossier polices/ à côté. Aucune dépendance externe.
+   Thème : suit le système ; forcé par <html data-theme="clair|sombre"> (voir biblio-theme.js).
+   Appli : <html data-appli="tour|veille|achats|bd|stats|archi|plan"> fixe --b-appli et --b-appli-texte. */
+
+@font-face { font-family: "Libre Bodoni"; font-weight: 400; font-style: normal; font-display: swap; src: url("polices/libre-bodoni-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Libre Bodoni"; font-weight: 400; font-style: italic; font-display: swap; src: url("polices/libre-bodoni-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Libre Bodoni"; font-weight: 500; font-style: normal; font-display: swap; src: url("polices/libre-bodoni-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-display: swap; src: url("polices/ibm-plex-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-display: swap; src: url("polices/ibm-plex-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-display: swap; src: url("polices/ibm-plex-sans-latin-600-normal.woff2") format("woff2"); }
+
+:root {
+  /* Polices */
+  --b-police-marque: "Libre Bodoni", Georgia, serif;      /* marque, titre de page, gros chiffres : 22 px et plus */
+  --b-police-interface: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; /* tout le reste, titres de livres compris */
+
+  /* Titres Bodoni (400) */
+  --b-titre-1: 40px;   /* titre de page, ordinateur */
+  --b-titre-2: 32px;   /* titre de page, téléphone ; gros chiffres ordinateur */
+  --b-titre-3: 28px;   /* gros chiffres téléphone */
+  --b-titre-4: 22px;   /* plancher Bodoni : marque dans l'en-tête, petits chiffres clés */
+
+  /* Texte Plex */
+  --b-texte-20: 20px;  /* intertitre (600) */
+  --b-texte-17: 17px;  /* titre de carte, titre de livre en liste (600) */
+  --b-texte-16: 16px;  /* texte courant téléphone */
+  --b-texte-15: 15px;  /* texte courant ordinateur, tableaux */
+  --b-texte-13: 13px;  /* légendes, métadonnées */
+  --b-texte-12: 12px;  /* étiquettes en capitales seulement (600, espacement .08em) */
+  --b-interligne: 1.5;
+  --b-interligne-titre: 1.15;
+
+  /* Rayons et ombres */
+  --b-rayon-1: 4px;    /* pastilles, champs */
+  --b-rayon-2: 8px;    /* cartes, boutons */
+  --b-rayon-3: 14px;   /* feuilles, fenêtres */
+  --b-rayon-tuile: 22%;/* tuile d'icône (coins transparents) */
+  --b-rayon-rond: 999px;
+  --b-ombre-1: 0 1px 2px rgba(26, 23, 20, .08);
+  --b-ombre-2: 0 8px 24px rgba(26, 23, 20, .16);
+
+  /* Neutres, clair */
+  --b-fond: #f6f3ec;
+  --b-carte: #ffffff;
+  --b-papier: #ebe5d9;
+  --b-filet: #d9d2c4;
+  --b-encre: #1a1714;     /* 16,1 : 1 sur crème */
+  --b-texte: #4a443c;     /* 8,7 : 1 */
+  --b-discret: #6e675d;   /* 5,0 : 1 */
+  --b-gris: #8a8378;      /* filets et icônes, jamais du texte */
+  --b-sur-aplat: #f6f3ec; /* texte posé sur une couleur d'appli ou d'action */
+
+  /* Action : un seul bleu */
+  --b-bleu: #3767af;
+  --b-sur-bleu: #ffffff;
+
+  /* États : texte et fond doux */
+  --b-succes: #2c7e44;  --b-succes-fond: #e3efe3;
+  --b-alerte: #8a5a00;  --b-alerte-fond: #f5ead2;
+  --b-erreur: #b42318;  --b-erreur-fond: #f6dfda;
+  --b-info:   #3767af;  --b-info-fond:   #e1e8f3;
+
+  /* Couleurs d'appli : aplat (tuile, écran de chargement, filet d'en-tête) et variante texte */
+  --b-tour: #c16048;   --b-tour-texte: #b05139;
+  --b-veille: #3767af; --b-veille-texte: #3767af;
+  --b-achats: #50a064; --b-achats-texte: #2c7e44;
+  --b-bd: #0a6355;     --b-bd-texte: #0a6355;
+  --b-stats: #2196a7;  --b-stats-texte: #007b8b;
+  --b-archi: #5a5176;  --b-archi-texte: #5a5176;
+  --b-plan: #ae7e80;   --b-plan-texte: #8f6163;
+
+  color-scheme: light;
+}
+
+/* Sombre : forcé, ou suivi du système si rien n'est forcé */
+:root[data-theme="sombre"] {
+  --b-fond: #1a1714; --b-carte: #24201b; --b-papier: #2e2822; --b-filet: #3a342d;
+  --b-encre: #f0ebe1; --b-texte: #d6cfc3; --b-discret: #a39a8c; --b-gris: #6e675d;
+  --b-sur-aplat: #f6f3ec;
+  --b-bleu: #5788d3; --b-sur-bleu: #10151c;
+  --b-succes: #6dbb7f; --b-succes-fond: #1f2a20;
+  --b-alerte: #d9a441; --b-alerte-fond: #2e2618;
+  --b-erreur: #e5766a; --b-erreur-fond: #33201c;
+  --b-info:   #6f9be0; --b-info-fond:   #1d2635;
+  --b-tour-texte: #cb6951; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #479283;
+  --b-stats-texte: #2196a7; --b-archi-texte: #8b82aa; --b-plan-texte: #ae7e80;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="clair"]) {
+    --b-fond: #1a1714; --b-carte: #24201b; --b-papier: #2e2822; --b-filet: #3a342d;
+    --b-encre: #f0ebe1; --b-texte: #d6cfc3; --b-discret: #a39a8c; --b-gris: #6e675d;
+    --b-sur-aplat: #f6f3ec;
+    --b-bleu: #5788d3; --b-sur-bleu: #10151c;
+    --b-succes: #6dbb7f; --b-succes-fond: #1f2a20;
+    --b-alerte: #d9a441; --b-alerte-fond: #2e2618;
+    --b-erreur: #e5766a; --b-erreur-fond: #33201c;
+    --b-info:   #6f9be0; --b-info-fond:   #1d2635;
+    --b-tour-texte: #cb6951; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #479283;
+    --b-stats-texte: #2196a7; --b-archi-texte: #8b82aa; --b-plan-texte: #ae7e80;
+    color-scheme: dark;
+  }
+}
+/* Les aplats d'appli (--b-tour, etc.) ne changent pas en sombre : la tuile reste identique. */
+
+/* Couleur de l'appli courante */
+:root[data-appli="tour"]   { --b-appli: var(--b-tour);   --b-appli-texte: var(--b-tour-texte); }
+:root[data-appli="veille"] { --b-appli: var(--b-veille); --b-appli-texte: var(--b-veille-texte); }
+:root[data-appli="achats"] { --b-appli: var(--b-achats); --b-appli-texte: var(--b-achats-texte); }
+:root[data-appli="bd"]     { --b-appli: var(--b-bd);     --b-appli-texte: var(--b-bd-texte); }
+:root[data-appli="stats"]  { --b-appli: var(--b-stats);  --b-appli-texte: var(--b-stats-texte); }
+:root[data-appli="archi"]  { --b-appli: var(--b-archi);  --b-appli-texte: var(--b-archi-texte); }
+:root[data-appli="plan"]   { --b-appli: var(--b-plan);   --b-appli-texte: var(--b-plan-texte); }
+
+/* ---------- En-tête d'appli ---------- */
+.b-entete { display: flex; align-items: center; gap: 24px; min-height: 64px; padding: 0 24px;
+  background: var(--b-carte); border-bottom: 1px solid var(--b-filet); box-shadow: inset 0 3px 0 var(--b-appli);
+  font-family: var(--b-police-interface); color: var(--b-encre); }
+.b-marque { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; } /* milieu de la tuile = milieu optique de « Biblio’ » */
+.b-marque-texte { white-space: nowrap; line-height: 1; position: relative; top: 2px; } /* Biblio’ et appli sur la même ligne de base ; 2 px compensent le centrage de Bodoni */
+.b-marque img { flex: none; width: 32px; height: 32px; border-radius: var(--b-rayon-tuile); }
+.b-marque-biblio { font: 400 24px/1 var(--b-police-marque); color: var(--b-encre); margin-right: 6px; }
+.b-marque-appli { font: 600 18px/1 var(--b-police-interface); letter-spacing: .08em; text-transform: uppercase; color: var(--b-appli-texte); }
+.b-entete nav { display: flex; gap: 4px; align-self: stretch; }
+.b-entete nav a { display: flex; align-items: center; padding: 0 12px; font: 500 15px var(--b-police-interface);
+  color: var(--b-discret); text-decoration: none; border-bottom: 2px solid transparent; }
+.b-entete nav a[aria-current="page"] { color: var(--b-encre); border-bottom-color: var(--b-appli-texte); }
+.b-entete-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.b-bascule { width: 40px; height: 40px; border-radius: var(--b-rayon-rond); border: 1px solid var(--b-filet);
+  background: transparent; display: grid; place-items: center; cursor: pointer; }
+.b-bascule::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--b-encre);
+  background: linear-gradient(90deg, var(--b-encre) 50%, transparent 50%); }
+@media (max-width: 720px) {
+  .b-entete { min-height: 56px; padding: 0 16px; gap: 12px; }
+  .b-marque img { width: 28px; height: 28px; }
+  .b-marque-biblio { font-size: 22px; }
+  .b-entete nav { display: none; }      /* navigation en bas d'écran sur téléphone */
+  .b-bascule { width: 44px; height: 44px; }
+}
+
+/* ---------- Écran de chargement ---------- */
+.b-chargement { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  background: var(--b-appli-texte); color: var(--b-sur-aplat); font-family: var(--b-police-interface); }
+.b-chargement-signet { font: 500 160px/1 var(--b-police-marque); }
+.b-chargement-biblio { font: 400 40px/1 var(--b-police-marque); }
+.b-chargement-appli { font: 600 20px/1 var(--b-police-interface); letter-spacing: .12em; text-transform: uppercase; }
+.b-chargement-barre { width: 120px; height: 3px; margin-top: 28px; background: rgba(246, 243, 236, .3); overflow: hidden; border-radius: 2px; }
+.b-chargement-barre::after { content: ""; display: block; width: 40%; height: 100%; background: currentColor; animation: b-va-vient 1.2s ease-in-out infinite; }
+@keyframes b-va-vient { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+:root[data-theme="sombre"] .b-chargement { background: var(--b-fond); color: var(--b-encre); }
+:root[data-theme="sombre"] .b-chargement-signet,
+:root[data-theme="sombre"] .b-chargement-appli,
+:root[data-theme="sombre"] .b-chargement-barre::after { color: var(--b-appli-texte); background-color: transparent; }
+:root[data-theme="sombre"] .b-chargement-barre { background: var(--b-filet); }
+:root[data-theme="sombre"] .b-chargement-barre::after { background: var(--b-appli-texte); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="clair"]) .b-chargement { background: var(--b-fond); color: var(--b-encre); }
+  :root:not([data-theme="clair"]) .b-chargement-signet,
+  :root:not([data-theme="clair"]) .b-chargement-appli { color: var(--b-appli-texte); }
+  :root:not([data-theme="clair"]) .b-chargement-barre { background: var(--b-filet); }
+  :root:not([data-theme="clair"]) .b-chargement-barre::after { background: var(--b-appli-texte); }
+}
+@media (prefers-reduced-motion: reduce) { .b-chargement-barre::after { animation: none; width: 100%; } }
+@media print { .b-chargement, .b-bascule { display: none; } .b-entete { box-shadow: none; } }
+
+/* Ajout Alcuin (18 octobre 2026) : « à l'impression, toujours clair ». Sans ce bloc,
+   une page en sombre s'imprimait en sombre. :not(#b-x) donne à la règle le poids
+   nécessaire pour passer devant les deux blocs sombres. */
+@media print {
+  :root:not(#b-x) {
+    --b-fond: #f6f3ec; --b-carte: #ffffff; --b-papier: #ebe5d9; --b-filet: #d9d2c4;
+    --b-encre: #1a1714; --b-texte: #4a443c; --b-discret: #6e675d; --b-gris: #8a8378;
+    --b-bleu: #3767af; --b-sur-bleu: #ffffff;
+    --b-succes: #2c7e44; --b-succes-fond: #e3efe3;
+    --b-alerte: #8a5a00; --b-alerte-fond: #f5ead2;
+    --b-erreur: #b42318; --b-erreur-fond: #f6dfda;
+    --b-info:   #3767af; --b-info-fond:   #e1e8f3;
+    --b-tour-texte: #b05139; --b-veille-texte: #3767af; --b-achats-texte: #2c7e44; --b-bd-texte: #0a6355;
+    --b-stats-texte: #007b8b; --b-archi-texte: #5a5176; --b-plan-texte: #8f6163;
+    color-scheme: light;
+  }
+}

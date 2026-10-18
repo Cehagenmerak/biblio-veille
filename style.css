@@ -9,16 +9,18 @@
   font-display: swap;
 }
 
+/* Harmonisation Biblio' (18 octobre 2026) : neutres et bleu branchés sur les jetons
+   communs (biblio-jetons.css). Le thème suit le système ; <html data-theme="clair|sombre">
+   le force (bouton de l'en-tête ou Réglages). */
 :root {
-  --bg: #f6f3ec;
-  --surface: #ffffff;
-  --surface2: #ebe5d9;
-  --ink: #1a1714;
-  --ink2: #6e675d;
-  --line: #d9d2c4;
-  --pri: #3767af;
-  --pri-ink: #3767af;
-  --head: #3767af;
+  --bg: var(--b-fond);
+  --surface: var(--b-carte);
+  --surface2: var(--b-papier);
+  --ink: var(--b-encre);
+  --ink2: var(--b-discret);
+  --line: var(--b-filet);
+  --pri: #3767af;               /* aplat d'action, texte blanc : identique en sombre */
+  --pri-ink: var(--b-bleu);
   --ok: oklch(0.5 0.12 150);
   --warn: oklch(0.52 0.12 65);
   --err: oklch(0.5 0.15 25);
@@ -37,18 +39,14 @@
 }
 /* Sombre : thème du système, sauf choix « Clair » dans Réglages */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1a1714; --surface: #24201b; --surface2: #2e2822; --ink: #f0ebe1; --ink2: #a39a8c; --line: #3a342d;
-    --pri: #3767af; --pri-ink: #5788d3; --head: #284a7e;
+  :root:not([data-theme="clair"]) {
     --ok: oklch(0.76 0.13 150); --warn: oklch(0.8 0.12 75); --err: oklch(0.72 0.15 25); --fonds: oklch(0.78 0.11 300);
     --prio1: oklch(0.42 0.06 245); --prio2: oklch(0.6 0.13 250); --prio3: oklch(0.76 0.13 250);
     --prio1-ink: #f0ebe1; --prio2-ink: #fff; --prio3-ink: #1a1714;
     color-scheme: dark;
   }
 }
-:root[data-theme="dark"] {
-  --bg: #1a1714; --surface: #24201b; --surface2: #2e2822; --ink: #f0ebe1; --ink2: #a39a8c; --line: #3a342d;
-  --pri: #3767af; --pri-ink: #5788d3; --head: #284a7e;
+:root[data-theme="sombre"] {
   --ok: oklch(0.76 0.13 150); --warn: oklch(0.8 0.12 75); --err: oklch(0.72 0.15 25); --fonds: oklch(0.78 0.11 300);
   --prio1: oklch(0.42 0.06 245); --prio2: oklch(0.6 0.13 250); --prio3: oklch(0.76 0.13 250);
   --prio1-ink: #f0ebe1; --prio2-ink: #fff; --prio3-ink: #1a1714;
@@ -89,17 +87,15 @@ button:disabled { cursor: default; }
 .barre-attente > div { width: 40%; height: 100%; background: var(--pri); animation: vibar 1.1s linear infinite; }
 
 /* ---------- Liste ---------- */
-.entete { background: var(--head); color: #fff; padding: calc(14px + env(safe-area-inset-top)) 16px 18px; }
-.entete-l1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-icone { width: 32px; height: 32px; border-radius: 8px; background: #1a1714; color: #f6f3ec; display: flex; align-items: center; justify-content: center; font: 600 15px/1 Newsreader, "Source Serif 4", Georgia, serif; letter-spacing: -.02em; }
-.logo-icone b { color: #d9573a; font-weight: 700; }
-.logo-titre { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
-.btn-reglages { min-height: 48px; padding: 0 14px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; border-radius: 10px; font-size: 15px; font-weight: 600; }
-.compteur { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }
+/* En-tête type de la famille Biblio' : marque, Réglages, bascule clair / sombre.
+   Le compteur reste dessous, sur le fond de page. */
+.entete { color: var(--ink); }
+.entete .b-entete { padding-top: env(safe-area-inset-top); min-height: calc(56px + env(safe-area-inset-top)); }
+.btn-reglages { min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 10px; font-size: 15px; font-weight: 600; }
+.compteur { display: flex; align-items: baseline; gap: 8px; padding: 14px 16px 0; }
 .compteur-n { font: 400 36px/1 var(--marque); font-variant-numeric: lining-nums; }
 .compteur-l { font-size: 16px; }
-.compteur-t { font-size: 15px; opacity: .75; }
+.compteur-t { font-size: 15px; color: var(--ink2); }
 .actions { padding: 14px 16px 6px; display: flex; flex-direction: column; gap: 10px; }
 .modes-scan { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .mode-scan { min-height: 64px; padding: 0 4px; border: 2px solid var(--pri); border-radius: 14px; background: var(--surface); color: var(--pri-ink); font-size: 16px; font-weight: 700; line-height: 1.15; }

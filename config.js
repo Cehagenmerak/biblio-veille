@@ -3,6 +3,9 @@
 // Le destinataire du mail et l'adresse PMB ne sont volontairement pas ici (dépôt public) :
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
+// Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
+const VERSION_APP = "1.0.0";
+
 const CONFIG = {
   objetMail: "Veille acquisitions",
 
