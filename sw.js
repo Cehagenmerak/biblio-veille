@@ -1,6 +1,6 @@
 // Cache de l'application pour qu'elle fonctionne hors ligne.
 // Changer VERSION à chaque modification des fichiers pour forcer la mise à jour.
-const VERSION = "v11";
+const VERSION = "v12";
 const CACHE = "biblio-veille-" + VERSION;
 const FICHIERS = [
   "./",

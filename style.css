@@ -12,15 +12,15 @@
 }
 
 :root {
-  --bg: #f5f6f7;
+  --bg: #f6f3ec;
   --surface: #ffffff;
-  --surface2: #eceff2;
-  --ink: #14181d;
-  --ink2: #56606b;
-  --line: #dde2e7;
-  --pri: #1f4e79;
-  --pri-ink: #1f4e79;
-  --head: #1f4e79;
+  --surface2: #ebe5d9;
+  --ink: #1a1714;
+  --ink2: #6e675d;
+  --line: #d9d2c4;
+  --pri: #3767af;
+  --pri-ink: #3767af;
+  --head: #3767af;
   --ok: oklch(0.5 0.12 150);
   --warn: oklch(0.52 0.12 65);
   --err: oklch(0.5 0.15 25);
@@ -29,7 +29,7 @@
   --prio1: oklch(0.78 0.07 245);
   --prio2: oklch(0.6 0.13 250);
   --prio3: oklch(0.42 0.15 258);
-  --prio1-ink: #14181d;
+  --prio1-ink: #1a1714;
   --prio2-ink: #fff;
   --prio3-ink: #fff;
   --font: "Atkinson Hyperlegible Next", system-ui, sans-serif;
@@ -39,20 +39,20 @@
 /* Sombre : thème du système, sauf choix « Clair » dans Réglages */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111418; --surface: #1a1f25; --surface2: #252b33; --ink: #e8ecf0; --ink2: #9ba6b2; --line: #2d3540;
-    --pri: #2e6ca6; --pri-ink: #8fbde9; --head: #15314c;
+    --bg: #1a1714; --surface: #24201b; --surface2: #2e2822; --ink: #f0ebe1; --ink2: #a39a8c; --line: #3a342d;
+    --pri: #3767af; --pri-ink: #5788d3; --head: #284a7e;
     --ok: oklch(0.76 0.13 150); --warn: oklch(0.8 0.12 75); --err: oklch(0.72 0.15 25); --fonds: oklch(0.78 0.11 300);
     --prio1: oklch(0.42 0.06 245); --prio2: oklch(0.6 0.13 250); --prio3: oklch(0.76 0.13 250);
-    --prio1-ink: #e8ecf0; --prio2-ink: #fff; --prio3-ink: #0c1a2a;
+    --prio1-ink: #f0ebe1; --prio2-ink: #fff; --prio3-ink: #1a1714;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111418; --surface: #1a1f25; --surface2: #252b33; --ink: #e8ecf0; --ink2: #9ba6b2; --line: #2d3540;
-  --pri: #2e6ca6; --pri-ink: #8fbde9; --head: #15314c;
+  --bg: #1a1714; --surface: #24201b; --surface2: #2e2822; --ink: #f0ebe1; --ink2: #a39a8c; --line: #3a342d;
+  --pri: #3767af; --pri-ink: #5788d3; --head: #284a7e;
   --ok: oklch(0.76 0.13 150); --warn: oklch(0.8 0.12 75); --err: oklch(0.72 0.15 25); --fonds: oklch(0.78 0.11 300);
   --prio1: oklch(0.42 0.06 245); --prio2: oklch(0.6 0.13 250); --prio3: oklch(0.76 0.13 250);
-  --prio1-ink: #e8ecf0; --prio2-ink: #fff; --prio3-ink: #0c1a2a;
+  --prio1-ink: #f0ebe1; --prio2-ink: #fff; --prio3-ink: #1a1714;
   color-scheme: dark;
 }
 
@@ -258,18 +258,18 @@ select.champ-saisie { padding: 0 12px; }
 .fonds-hit span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fonds-hit span:last-child { flex: none; color: var(--fonds); font-weight: 600; }
 .case-ligne { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 15px; font-weight: 600; text-align: left; }
-.apercu { border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #14181d; max-height: 240px; overflow-y: auto; }
-.apercu-intro { padding: 10px 12px; font-size: 13px; line-height: 1.4; border-bottom: 1px solid #dde2e7; }
+.apercu { border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #1a1714; max-height: 240px; overflow-y: auto; }
+.apercu-intro { padding: 10px 12px; font-size: 13px; line-height: 1.4; border-bottom: 1px solid #d9d2c4; }
 .apercu-tete, .apercu-ligne { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; padding: 8px 12px; }
-.apercu-tete { padding: 6px 12px; background: #eceff2; font: 600 10px var(--mono); color: #56606b; text-transform: uppercase; }
-.apercu-ligne { border-bottom: 1px solid #eceff2; align-items: start; }
-.apercu-couv { width: 34px; height: 50px; border-radius: 3px; object-fit: cover; background: #eceff2; }
-.apercu-sans { width: 34px; height: 50px; border-radius: 3px; border: 1px dashed #c5ccd4; }
+.apercu-tete { padding: 6px 12px; background: #ebe5d9; font: 600 10px var(--mono); color: #6e675d; text-transform: uppercase; }
+.apercu-ligne { border-bottom: 1px solid #ebe5d9; align-items: start; }
+.apercu-couv { width: 34px; height: 50px; border-radius: 3px; object-fit: cover; background: #ebe5d9; }
+.apercu-sans { width: 34px; height: 50px; border-radius: 3px; border: 1px dashed #bdb4a5; }
 .apercu-livre { min-width: 0; font-size: 12px; line-height: 1.35; }
 .apercu-livre b { font-size: 13px; display: block; }
-.apercu-livre div { color: #56606b; }
+.apercu-livre div { color: #6e675d; }
 .apercu-prio { font: 600 11px var(--mono); padding: 3px 6px; border-radius: 5px; white-space: nowrap; }
-.apercu-credit { padding: 8px 12px; font-size: 11px; color: #56606b; }
+.apercu-credit { padding: 8px 12px; font-size: 11px; color: #6e675d; }
 .apercu-texte { padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); font: 400 12px/1.5 var(--mono); white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
 .poids { font: 400 12px/1.5 var(--mono); color: var(--ink2); }
 .pile-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 8px 14px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--ink); text-align: left; }
@@ -279,7 +279,7 @@ select.champ-saisie { padding: 0 12px; }
 .pile-item .statut { font-size: 13px; font-weight: 600; }
 
 #toast { position: fixed; left: 16px; right: 16px; bottom: calc(90px + env(safe-area-inset-bottom)); z-index: 30; display: flex; justify-content: center; pointer-events: none; }
-#toast > div { padding: 12px 16px; border-radius: 12px; background: #1b1f24; color: #fff; font-size: 15px; box-shadow: 0 8px 20px rgba(0,0,0,.25); text-align: center; }
+#toast > div { padding: 12px 16px; border-radius: 12px; background: #1a1714; color: #fff; font-size: 15px; box-shadow: 0 8px 20px rgba(0,0,0,.25); text-align: center; }
 
 /* ---------- Scanner ---------- */
 #scanner { position: fixed; inset: 0; z-index: 10; background: #000; color: #fff; overflow: hidden; font-family: var(--font); }
@@ -290,8 +290,8 @@ select.champ-saisie { padding: 0 12px; }
 .ligne-visee { position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; background: rgba(255,80,80,.8); }
 #scanner.pile .ligne-visee { display: none; }
 .pile-boite { position: absolute; border: 3px solid var(--c); border-radius: 6px; background: color-mix(in oklch, var(--c) 18%, transparent); pointer-events: none; }
-.pile-boite span { position: absolute; left: -3px; top: 100%; margin-top: 3px; padding: 2px 6px; border-radius: 4px; background: var(--c); color: #10141a; font: 600 11px var(--mono); white-space: nowrap; }
-.flash { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); pointer-events: none; padding: 10px 18px; border-radius: 999px; color: #0c1a10; font-size: 18px; font-weight: 700; white-space: nowrap; z-index: 2; }
+.pile-boite span { position: absolute; left: -3px; top: 100%; margin-top: 3px; padding: 2px 6px; border-radius: 4px; background: var(--c); color: #1a1714; font: 600 11px var(--mono); white-space: nowrap; }
+.flash { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); pointer-events: none; padding: 10px 18px; border-radius: 999px; color: #1a1714; font-size: 18px; font-weight: 700; white-space: nowrap; z-index: 2; }
 .scan-haut { position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 10px; right: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .scan-pastille { min-height: 48px; padding: 0 14px; border: 0; border-radius: 12px; background: rgba(0,0,0,.55); color: #fff; font-size: 15px; font-weight: 700; }
 .kilo-compteur { padding: 6px 14px; border-radius: 12px; background: rgba(0,0,0,.55); text-align: right; line-height: 1.05; }
@@ -311,9 +311,9 @@ select.champ-saisie { padding: 0 12px; }
 .zoom-val { font-weight: 600; font-size: 13px; width: 40px; text-align: right; }
 .scan-outils { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .scan-outil { min-height: 52px; border: 1px solid rgba(255,255,255,.35); border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; font-size: 15px; font-weight: 600; line-height: 1.1; }
-.scan-outil.on { border: 0; background: #fff; color: #1f4e79; font-weight: 700; }
+.scan-outil.on { border: 0; background: #fff; color: #3767af; font-weight: 700; }
 .scan-outil:disabled { opacity: .4; }
-.btn-terminer { min-height: 56px; border: 0; border-radius: 14px; background: #fff; color: #1f4e79; font-size: 18px; font-weight: 700; }
+.btn-terminer { min-height: 56px; border: 0; border-radius: 14px; background: #fff; color: #3767af; font-size: 18px; font-weight: 700; }
 
 /* Grand écran : l'appli reste à largeur de téléphone */
 @media (min-width: 600px) {
