@@ -1,6 +1,6 @@
 // Cache de l'application pour qu'elle fonctionne hors ligne.
 // Changer VERSION à chaque modification des fichiers pour forcer la mise à jour.
-const VERSION = "v12";
+const VERSION = "v13";
 const CACHE = "biblio-veille-" + VERSION;
 const FICHIERS = [
   "./",
@@ -11,7 +11,10 @@ const FICHIERS = [
   "scan.js",
   "app.js",
   "vendor/zxing.min.js",
-  "vendor/fonts/atkinson-next.woff2",
+  "vendor/fonts/ibm-plex-sans-latin-400-normal.woff2",
+  "vendor/fonts/ibm-plex-sans-latin-500-normal.woff2",
+  "vendor/fonts/ibm-plex-sans-latin-600-normal.woff2",
+  "vendor/fonts/libre-bodoni-latin-400-normal.woff2",
   "vendor/fonts/atkinson-mono.woff2",
   "manifest.webmanifest",
   "icon-192.png",

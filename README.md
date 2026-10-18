@@ -25,4 +25,4 @@ Le destinataire du mail et l'adresse PMB se saisissent dans l'application.
 Après chaque modification des fichiers, changer `VERSION` dans `sw.js` pour forcer la mise à jour sur le téléphone.
 
 ## Licences
-ZXing (`vendor/`) : Apache 2.0. Polices Atkinson Hyperlegible (`vendor/fonts/`) : SIL OFL 1.1.
+ZXing (`vendor/`) : Apache 2.0. Polices IBM Plex Sans, Libre Bodoni et Atkinson Hyperlegible Mono (`vendor/fonts/`) : SIL OFL 1.1.

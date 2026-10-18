@@ -1,9 +1,7 @@
-@font-face {
-  font-family: "Atkinson Hyperlegible Next";
-  src: url("vendor/fonts/atkinson-next.woff2") format("woff2");
-  font-weight: 200 800;
-  font-display: swap;
-}
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-display: swap; src: url("vendor/fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-display: swap; src: url("vendor/fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-display: swap; src: url("vendor/fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Libre Bodoni"; font-weight: 400; font-display: swap; src: url("vendor/fonts/libre-bodoni-latin-400-normal.woff2") format("woff2"); }
 @font-face {
   font-family: "Atkinson Hyperlegible Mono";
   src: url("vendor/fonts/atkinson-mono.woff2") format("woff2");
@@ -32,7 +30,8 @@
   --prio1-ink: #1a1714;
   --prio2-ink: #fff;
   --prio3-ink: #fff;
-  --font: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --marque: "Libre Bodoni", Georgia, serif;  /* gros chiffres et titre de page seulement, 22 px et plus */
   --mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
   color-scheme: light;
 }
@@ -98,7 +97,7 @@ button:disabled { cursor: default; }
 .logo-titre { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
 .btn-reglages { min-height: 48px; padding: 0 14px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; border-radius: 10px; font-size: 15px; font-weight: 600; }
 .compteur { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }
-.compteur-n { font-size: 34px; font-weight: 700; line-height: 1; }
+.compteur-n { font: 400 36px/1 var(--marque); font-variant-numeric: lining-nums; }
 .compteur-l { font-size: 16px; }
 .compteur-t { font-size: 15px; opacity: .75; }
 .actions { padding: 14px 16px 6px; display: flex; flex-direction: column; gap: 10px; }
