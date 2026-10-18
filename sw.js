@@ -1,6 +1,6 @@
 // Cache de l'application pour qu'elle fonctionne hors ligne.
 // Changer VERSION à chaque modification des fichiers pour forcer la mise à jour.
-const VERSION = "v10";
+const VERSION = "v11";
 const CACHE = "biblio-veille-" + VERSION;
 const FICHIERS = [
   "./",
@@ -16,6 +16,9 @@ const FICHIERS = [
   "manifest.webmanifest",
   "icon-192.png",
   "icon-512.png",
+  "apple-touch-icon.png",
+  "favicon-32.png",
+  "favicon-16.png",
 ];
 
 self.addEventListener("install", (e) => {
