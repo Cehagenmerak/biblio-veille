@@ -123,6 +123,19 @@ button:disabled { cursor: default; }
 .envoyes-bascule { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 16px 6px; }
 .envoyes-bascule span { font-size: 13px; color: var(--ink2); min-width: 0; }
 .envoyes-bascule button { flex: none; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--pri-ink); font-size: 14px; font-weight: 700; }
+.envoyes-boutons { display: flex; gap: 6px; flex: none; }
+
+/* Archives des envois */
+.archives { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.envoi { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.envoi-tete { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border: 0; background: transparent; text-align: left; color: inherit; }
+.envoi-titre { font-size: 15px; font-weight: 700; }
+.envoi-n { font-size: 13px; color: var(--ink2); }
+.envoi-livres { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.envoi-livre { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-height: 48px; padding: 8px 14px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; color: inherit; }
+.envoi-livre .t { font-size: 15px; }
+.envoi-livre .a { font-size: 13px; color: var(--ink2); }
+.envoi .grille2 { padding: 10px 14px 12px; }
 
 .liste { flex: 1; overflow-y: auto; background: var(--surface); border-top: 1px solid var(--line); overscroll-behavior: contain; }
 .liste-vide { padding: 32px 24px; text-align: center; color: var(--ink2); font-size: 15px; }

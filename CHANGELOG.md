@@ -14,6 +14,16 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.2.0] - 2026-10-19
+
+### Ajouté
+- Écran **Archives** (bouton à côté de « Afficher / Masquer » les envoyés) : les envois du plus
+  récent au plus ancien (« Envoi du 19/10/2026 à 09:30 · 12 livres »), les envois d'avant la date
+  d'envoi regroupés en « Envoi non daté ». Pour chaque envoi : ses livres (un toucher ouvre la
+  fiche, qui ramène aux Archives), **Remettre à envoyer** (mail perdu, envoi à refaire) et
+  **Supprimer l'envoi** (livres et photos quittent le téléphone ; ils ne sont plus reconnus au
+  scan, ce qui est déjà dans Biblio' Achats y reste).
+
 ## [1.1.0] - 2026-10-19
 
 ### Ajouté

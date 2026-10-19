@@ -126,7 +126,7 @@ function render() {
   const focusId = actif && app.contains(actif) && actif.id;
   const curseur = focusId && actif.selectionStart != null ? [actif.selectionStart, actif.selectionEnd] : null;
   if (E.ecran === "fiche" && !livre(E.ficheId)) E.ecran = "liste";
-  app.innerHTML = E.ecran === "fiche" ? vueFiche() : E.ecran === "reglages" ? vueReglages() : vueListe();
+  app.innerHTML = E.ecran === "fiche" ? vueFiche() : E.ecran === "reglages" ? vueReglages() : E.ecran === "archives" ? vueArchives() : vueListe();
   if (memeEcran) {
     const d = app.querySelector(".liste, .contenu");
     if (d) d.scrollTop = pos;
@@ -209,7 +209,7 @@ function vueListe() {
   if (nEnv) {
     h += `<div class="envoyes-bascule"><span>${
       R.afficherEnvoyes ? `${nEnv} envoyé${pl(nEnv)} visible${pl(nEnv)}` : `${nEnv} envoyé${pl(nEnv)} masqué${pl(nEnv)} · toujours reconnu${pl(nEnv)} au scan`
-    }</span><button data-a="basculerEnvoyes">${R.afficherEnvoyes ? "Masquer les envoyés" : `Afficher les ${nEnv} envoyé${pl(nEnv)}`}</button></div>`;
+    }</span><span class="envoyes-boutons"><button data-a="basculerEnvoyes">${R.afficherEnvoyes ? "Masquer" : "Afficher"}</button><button data-a="archives">Archives</button></span></div>`;
   }
 
   h += `<div class="liste" id="liste">`;
@@ -254,6 +254,51 @@ function vueListe() {
     </div>`;
   }
   return `<div class="ecran">${h}</div>`;
+}
+
+// ---------- Archives : les envois, du plus récent au plus ancien ----------
+
+// Un envoi = les livres confirmés « envoyé » ensemble (même minute). Les envois d'avant
+// l'enregistrement de la date (sans `sentAt`) forment un dernier groupe, non daté.
+function envois() {
+  const groupes = new Map();
+  for (const l of visibles().filter((x) => x.sent)) {
+    const k = l.sentAt ? String(Math.floor(l.sentAt / MIN)) : "nd";
+    if (!groupes.has(k)) groupes.set(k, { k, quand: l.sentAt || 0, livres: [] });
+    groupes.get(k).livres.push(l);
+  }
+  return [...groupes.values()].sort((a, b) => b.quand - a.quand);
+}
+
+function libelleEnvoi(g) {
+  if (!g.quand) return "Envoi non daté";
+  const d = new Date(g.quand);
+  return `Envoi du ${d.toLocaleDateString("fr-FR")} à ${d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function vueArchives() {
+  const gs = envois();
+  const n = gs.reduce((s, g) => s + g.livres.length, 0);
+  let h = `<div class="barre-haut"><button class="btn-lien" data-a="liste">← Liste</button>
+    <div class="titre" style="padding-right:70px">Archives</div></div><div class="contenu archives">
+    <div class="note">${n ? `${n} livre${pl(n)} proposé${pl(n)} aux acquisitions, en ${gs.length} envoi${pl(gs.length)}. Ils restent reconnus au scan tant qu'ils sont ici.` : "Aucun envoi pour l'instant."}</div>`;
+  for (const g of gs) {
+    const ouvert = E.archiveOuverte === g.k;
+    const nPhotos = g.livres.filter((l) => l.photo).length;
+    h += `<div class="envoi"><button class="envoi-tete" data-a="archiveOuvrir" data-k="${g.k}" aria-expanded="${ouvert}">
+      <span class="envoi-titre">${esc(libelleEnvoi(g))}</span>
+      <span class="envoi-n">${g.livres.length} livre${pl(g.livres.length)}${nPhotos ? ` · ${nPhotos} photo${pl(nPhotos)}` : ""} ${ouvert ? "▴" : "▾"}</span></button>`;
+    if (ouvert) {
+      h += `<div class="envoi-livres">${g.livres
+        .map((l) => `<button class="envoi-livre" data-a="archiveFiche" data-k="${l.id}"><span class="t">${esc(l.fields.titre || formaterIsbn(l.isbn))}</span>${
+          l.fields.auteur ? `<span class="a">${esc(l.fields.auteur)}</span>` : ""}</button>`)
+        .join("")}</div>
+      <div class="grille2"><button class="btn" data-a="archiveRemettre" data-k="${g.k}">Remettre à envoyer</button>
+        <button class="btn btn-danger" data-a="archiveSupprimer" data-k="${g.k}">Supprimer l'envoi</button></div>`;
+    }
+    h += `</div>`;
+  }
+  return `<div class="ecran">${h}<div style="height:16px"></div></div></div>`;
 }
 
 function libelleSession(items) {
@@ -387,7 +432,7 @@ function vueFiche() {
   const etat = l.isbn ? l.bnf : "na";
   const [bTitre, bDesc, bBtn] = TEXTES_BNF[etat];
   let h = `<div class="barre-haut">
-    <button class="btn-lien" data-a="${brouillon ? "ficheAnnuler" : "ficheRetour"}">← Liste</button>
+    <button class="btn-lien" data-a="${brouillon ? "ficheAnnuler" : "ficheRetour"}">← ${E.retour === "archives" ? "Archives" : "Liste"}</button>
     <div class="titre">${brouillon ? "Nouveau livre" : "Fiche du livre"}</div>
     ${brouillon ? `<div style="width:80px"></div>` : `<button class="btn-suppr" data-a="ficheSuppr">Supprimer</button>`}
   </div><div class="contenu">`;
@@ -625,6 +670,18 @@ function vueFeuille() {
           })
           .join("")}</div>
         <div class="grille2b"><button class="btn" data-a="recadrer">Recadrer</button><button class="btn btn-pri" data-a="ajouterPile" ${nAj ? "" : "disabled"}>Ajouter ${nAj} livre${pl(nAj)}</button></div>`;
+    }
+    case "archive": {
+      const g = envois().find((x) => x.k === f.k);
+      if (!g) return "";
+      const n = g.livres.length, suppr = f.action === "supprimer";
+      return `<div class="f-titre">${suppr ? `Supprimer l'envoi (${n} livre${pl(n)}) ?` : `Remettre ${n} livre${pl(n)} à envoyer ?`}</div>
+        <div class="f-texte">${esc(libelleEnvoi(g))}. ${
+          suppr
+            ? "Les livres et leurs photos quittent le téléphone : ils ne seront plus reconnus au scan. Ce qui a été versé dans Biblio' Achats y reste."
+            : "Ils reviennent dans la liste, prêts pour un nouvel envoi (mail perdu, envoi à refaire)."
+        }</div>
+        <div class="grille2"><button class="btn" data-a="fermerFeuille">Annuler</button><button class="btn btn-pri"${suppr ? ' style="background:var(--err)"' : ""} data-a="archiveConfirmer">${suppr ? "Supprimer" : "Remettre"}</button></div>`;
     }
     case "suppr": {
       const n = E.sel ? E.sel.size : 0;
@@ -1217,8 +1274,12 @@ function erreurFiche(l) {
 function quitterFiche() {
   const l = livre(E.ficheId);
   if (l?.manual && (E.ficheErr = erreurFiche(l))) return;
-  Object.assign(E, { ecran: "liste", ficheId: null, ficheErr: null });
+  // Une fiche ouverte depuis les Archives y ramène.
+  Object.assign(E, { ecran: E.retour || "liste", ficheId: null, ficheErr: null, retour: null });
 }
+
+// Livres d'un envoi des Archives, par sa clé.
+const livresDeLEnvoi = (k) => (envois().find((g) => g.k === k) || { livres: [] }).livres;
 
 const ACTIONS = {
   reglages: () => ((E.ecran = "reglages"), (E.pmbEtat = "idle")),
@@ -1243,6 +1304,23 @@ const ACTIONS = {
     if (E.sel) E.sel = new Set();
   },
   fermerBandeau: () => (E.bandeau = null),
+  archives: () => ((E.ecran = "archives"), (E.sel = null)),
+  archiveOuvrir: (el) => (E.archiveOuverte = E.archiveOuverte === el.dataset.k ? null : el.dataset.k),
+  archiveFiche: (el) => Object.assign(E, { ecran: "fiche", ficheId: el.dataset.k, ficheErr: null, retour: "archives" }),
+  archiveRemettre: (el) => (E.feuille = { type: "archive", action: "remettre", k: el.dataset.k }),
+  archiveSupprimer: (el) => (E.feuille = { type: "archive", action: "supprimer", k: el.dataset.k }),
+  archiveConfirmer: () => {
+    const f = E.feuille, ids = livresDeLEnvoi(f.k).map((l) => l.id), n = ids.length;
+    if (f.action === "remettre") {
+      for (const id of ids) maj(id, (l) => ((l.sent = false), delete l.sentAt));
+      toast(`${n} livre${pl(n)} remis à envoyer`);
+    } else {
+      supprimerLivres(ids);
+      toast(`${n} livre${pl(n)} supprimé${pl(n)}`);
+    }
+    E.feuille = null;
+    E.archiveOuverte = null;
+  },
   bnfSel: () => {
     const ids = [...E.sel];
     E.sel = null;
