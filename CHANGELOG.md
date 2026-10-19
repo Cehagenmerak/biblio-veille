@@ -14,6 +14,13 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.3.0] - 2026-10-19
+
+### Ajouté
+- L'extension (renommée **Biblio' Veilleuse**, ex Biblio' Cueillette) transmet aussi le public et la
+  cote qu'elle propose d'après le rayon du libraire : ils remplissent la fiche. La date de parution,
+  le rayon, la collection et le format vont en commentaire, avec le site d'origine.
+
 ## [1.2.0] - 2026-10-19
 
 ### Ajouté

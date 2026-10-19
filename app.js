@@ -1628,11 +1628,17 @@ function ajoutDepuisAdresse() {
   for (const k of ["titre", "auteur", "editeur", "prix"]) {
     if (g(k)) (l.fields[k] = g(k)), (l.src[k] = "user");
   }
+  // Public et cote proposés par l'extension, s'ils existent dans config.js.
+  if (PUBLICS.includes(g("public"))) (l.fields.public = g("public")), (l.src.public = "user");
+  if (COTES.some((c) => c.v === g("cote"))) (l.fields.cote = g("cote")), (l.src.cote = "user");
   let site = "";
   try {
     site = g("page") ? new URL(g("page")).hostname.replace(/^www\./, "") : "";
   } catch {}
-  if (site) (l.fields.commentaire = "Repéré sur " + site), (l.src.commentaire = "user");
+  // Parution, rayon, collection, format : en commentaire (Achats les reprend au versement).
+  const note = [site && "Repéré sur " + site, g("parution") && "parution " + g("parution"), g("rayon") && "rayon : " + g("rayon"),
+    g("collection") && "collection " + g("collection"), g("format")].filter(Boolean).join(" · ");
+  if (note) (l.fields.commentaire = note), (l.src.commentaire = "user");
   livres.push(l);
   sauver();
   Object.assign(E, { ecran: "fiche", ficheId: l.id, ficheErr: null, feuille: null, retour: null });
