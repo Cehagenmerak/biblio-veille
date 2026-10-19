@@ -14,6 +14,17 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.1.0] - 2026-10-19
+
+### Ajouté
+- Cotes alignées sur Biblio' Achats : mangas par âge (ABDM, JBDM, EBDM ; MAN reste pour un
+  manga dont l'âge est à préciser) et E1DOC (premiers documentaires).
+- Motifs « Tome manquant » et « Fin de série », comme dans Achats.
+
+### Changé côté Achats (rien à faire dans l'appli)
+- Biblio' Achats relève lui-même les envois « Veille acquisitions » à son ouverture, et la
+  priorité arrive dans son propre champ au lieu du commentaire.
+
 ## [1.0.0] - 2026-10-18 (ex v14)
 
 ### Modifié

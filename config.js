@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.0.0";
+const VERSION_APP = "1.1.0";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",
@@ -23,7 +23,10 @@ const CONFIG = {
       options: [
         "Complément de série", "Demande usager", "Rentrée littéraire", "Classique ou incontournable",
         "Auteur suivi", "Rachat ou remplacement", "Sélection prix littéraire", "Thématique", "Coup de coeur",
+        "Tome manquant", "Fin de série",
       ],
+      // Même liste que Biblio' Achats (referentiels/motifs.csv). « Coup de coeur » reste écrit ainsi
+      // pour les fiches déjà enregistrées : Achats le ramène à « Coup de cœur » au versement.
     },
     { id: "editeur", label: "Éditeur", placeholder: "Maison d'édition" },
     { id: "prix", label: "Prix indicatif", placeholder: "ex. 22,50 €" },
@@ -35,6 +38,7 @@ const CONFIG = {
   favorisParDefaut: ["editeur", "prix", "commentaire"],
 
   // Cotes PMB : [cote, libellé, public]. Public null = « à déterminer » (pas de filtre).
+  // Alignées le 19 octobre 2026 sur referentiels/cotes.csv de Biblio' Achats (mangas par âge, E1DOC).
   cotes: [
     ["R", "Roman adulte", "Adulte"],
     ["RX", "Roman policier adulte", "Adulte"],
@@ -48,7 +52,10 @@ const CONFIG = {
     ["JRX", "Roman policier ado", "Ado"],
     ["JRSF", "Roman science-fiction ado", "Ado"],
     ["JBD", "Bande dessinée ado", "Ado"],
-    ["MAN", "Manga", null],
+    ["ABDM", "Manga adulte", "Adulte"],
+    ["JBDM", "Manga ado", "Ado"],
+    ["EBDM", "Manga enfant", "Enfant"],
+    ["MAN", "Manga, âge à préciser", null],
     ["ERX", "Roman policier enfant", "Enfant"],
     ["ERSF", "Roman science-fiction enfant", "Enfant"],
     ["TER", "Terroir", "Adulte"],
@@ -56,6 +63,7 @@ const CONFIG = {
     ["PL", "Première lecture", "Enfant"],
     ["EDOC", "Documentaire enfant", "Enfant"],
     ["EABB", "Album bébé", "Bébé"],
+    ["E1DOC", "Premiers documentaires", "Bébé"],
     ["ADET", "À déterminer", null],
   ],
 
