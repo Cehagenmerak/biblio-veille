@@ -13,6 +13,7 @@ Application web installable (PWA), sans serveur ni compte : les données restent
 - **Fonds PMB** : signale les livres déjà possédés, au scan et/ou avant l'envoi (adresse du connecteur dans Réglages).
 - **Envoi** : tableau HTML partagé vers la messagerie, ou texte simple ; les livres envoyés sont masqués mais toujours reconnus au scan. Biblio' Achats relève le mail tout seul à son ouverture.
 - **Archives** : les envois par date ; remettre un envoi à envoyer, ou le supprimer du téléphone pour faire de la place.
+- **Depuis un site de libraire** : l'extension Firefox Biblio' Cueillette (dossier `../extension-firefox/` du workspace) ouvre l'appli sur `#ajout?isbn=…&titre=…` ; le livre est ajouté et sa fiche s'ouvre.
 
 ## Format du mail
 L'outil d'acquisitions de la bibliothèque lit ce mail : ne pas changer ce format sans adapter son lecteur (`veille.py`).

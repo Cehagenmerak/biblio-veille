@@ -1603,10 +1603,50 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.dataset.i === "isbnTape") ACTIONS.validerIsbn();
 });
 
+// ---------- Livre envoyé par l'extension Firefox (ou un favori) ----------
+// Adresse : …/index.html#ajout?isbn=…&titre=…&auteur=…&editeur=…&prix=…&page=…
+// Le livre est ajouté à la liste, sa fiche s'ouvre, la BnF complète ce qui manque.
+
+function ajoutDepuisAdresse() {
+  const h = location.hash;
+  if (!h.startsWith("#ajout?")) return false;
+  history.replaceState(null, "", location.pathname + location.search);
+  const p = new URLSearchParams(h.slice(7));
+  const g = (k) => (p.get(k) || "").trim().slice(0, 300);
+  const isbn = g("isbn").replace(/[^0-9Xx]/g, "");
+  const ok = !!isbn && isbnValide(isbn);
+  const existant = ok && livres.find((l) => l.isbn === isbn && !l.draft);
+  if (existant) {
+    E.feuille = { type: "confirm", id: existant.id, genre: "dup" };
+    return true;
+  }
+  if (!ok && !g("titre")) {
+    toast("Rien de reconnu sur la page : ni ISBN ni titre.");
+    return true;
+  }
+  const l = nouveauLivre(ok ? isbn : "", ok ? {} : { manual: true });
+  for (const k of ["titre", "auteur", "editeur", "prix"]) {
+    if (g(k)) (l.fields[k] = g(k)), (l.src[k] = "user");
+  }
+  let site = "";
+  try {
+    site = g("page") ? new URL(g("page")).hostname.replace(/^www\./, "") : "";
+  } catch {}
+  if (site) (l.fields.commentaire = "Repéré sur " + site), (l.src.commentaire = "user");
+  livres.push(l);
+  sauver();
+  Object.assign(E, { ecran: "fiche", ficheId: l.id, ficheErr: null, feuille: null, retour: null });
+  if (ok) interrogerLot([l.id], false);
+  toast(`Livre ajouté${site ? " depuis " + site : ""}`);
+  return true;
+}
+window.addEventListener("hashchange", () => ajoutDepuisAdresse() && render());
+
 // ---------- Démarrage ----------
 
 appliquerTheme();
 sauver(); // enregistre la conversion depuis la première version, le cas échéant
+ajoutDepuisAdresse();
 render();
 
 if ("serviceWorker" in navigator) {

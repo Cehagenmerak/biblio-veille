@@ -23,6 +23,10 @@ dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN �
   fiche, qui ramène aux Archives), **Remettre à envoyer** (mail perdu, envoi à refaire) et
   **Supprimer l'envoi** (livres et photos quittent le téléphone ; ils ne sont plus reconnus au
   scan, ce qui est déjà dans Biblio' Achats y reste).
+- Réception d'un livre envoyé par l'extension Firefox **Biblio' Cueillette** (ou un favori) :
+  l'adresse `…/index.html#ajout?isbn=…&titre=…&auteur=…&editeur=…&prix=…&page=…` ajoute le livre
+  (« Repéré sur decitre.fr » en commentaire), ouvre sa fiche et interroge la BnF ; un livre déjà
+  dans la liste est signalé, rien n'est ajouté deux fois.
 
 ## [1.1.0] - 2026-10-19
 
