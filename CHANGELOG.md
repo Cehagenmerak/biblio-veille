@@ -14,6 +14,13 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.6.1] - 2026-10-25
+
+### Modifié
+- **Supprimer la fiche d'un livre demande confirmation** : un panneau « Supprimer ce livre ? »
+  (titre ou ISBN, fiche et photo quittant le téléphone) s'ouvre avant la suppression. Après
+  suppression, retour à l'écran d'où la fiche avait été ouverte (liste ou Archives).
+
 ## [1.6.0] - 2026-10-25
 
 ### Ajouté

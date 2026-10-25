@@ -692,6 +692,14 @@ function vueFeuille() {
         }</div>
         <div class="grille2"><button class="btn" data-a="fermerFeuille">Annuler</button><button class="btn btn-pri"${suppr ? ' style="background:var(--err)"' : ""} data-a="archiveConfirmer">${suppr ? "Supprimer" : "Remettre"}</button></div>`;
     }
+    case "supprFiche": {
+      const l = livre(f.id);
+      if (!l) return "";
+      const nom = (l.fields.titre || "").trim() || formaterIsbn(l.isbn) || "Ce livre";
+      return `<div class="f-titre">Supprimer ce livre ?</div>
+        <div class="f-texte">${esc(nom)}. La fiche et sa photo quittent le téléphone : ce livre ne sera plus reconnu au scan.</div>
+        <div class="grille2"><button class="btn" data-a="fermerFeuille">Annuler</button><button class="btn btn-pri" style="background:var(--err)" data-a="ficheSupprConfirmer">Supprimer</button></div>`;
+    }
     case "suppr": {
       const n = E.sel ? E.sel.size : 0;
       return `<div class="f-titre">Supprimer ${n} livre${pl(n)} ?</div>
@@ -1443,10 +1451,10 @@ const ACTIONS = {
   // Fiche
   ficheRetour: quitterFiche,
   ficheAnnuler: annulerBrouillon,
-  ficheSuppr: () => {
+  ficheSuppr: () => (E.feuille = { type: "supprFiche", id: E.ficheId }),
+  ficheSupprConfirmer: () => {
     supprimerLivres([E.ficheId]);
-    E.ecran = "liste";
-    E.ficheId = null;
+    Object.assign(E, { ecran: E.retour || "liste", ficheId: null, retour: null, feuille: null });
     toast("Livre supprimé");
   },
   ficheEnregistrer: () => {
