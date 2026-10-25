@@ -1,7 +1,7 @@
 // Cache de l'application pour qu'elle fonctionne hors ligne.
 // VERSION : numéro SemVer (voir CHANGELOG.md), le même que VERSION_APP dans config.js.
 // Le changer à chaque modification des fichiers pour forcer la mise à jour.
-const VERSION = "1.5.0";
+const VERSION = "1.6.0";
 const CACHE = "biblio-veille-" + VERSION;
 const FICHIERS = [
   "./",

@@ -37,7 +37,27 @@ const Camera = {
     if (t) t.applyConstraints({ advanced: [{ zoom: v }] }).catch(() => {});
   },
 
+  // Mise au point forcée au toucher (x, y entre 0 et 1 dans l'image de la caméra), puis retour
+  // à la mise au point continue. Renvoie false si l'appareil ne sait pas la faire.
+  async mettreAuPoint(x, y) {
+    const t = this.piste();
+    const modes = (t && t.getCapabilities && t.getCapabilities().focusMode) || [];
+    if (!modes.includes("single-shot")) return false;
+    try {
+      // pointsOfInterest est ignoré par les appareils qui ne le gèrent pas : la mise au point se fait alors au centre.
+      await t.applyConstraints({ advanced: [{ focusMode: "single-shot", pointsOfInterest: [{ x, y }] }] });
+    } catch {
+      return false;
+    }
+    clearTimeout(this.retourContinu);
+    if (modes.includes("continuous")) {
+      this.retourContinu = setTimeout(() => t.applyConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {}), 1500);
+    }
+    return true;
+  },
+
   arreter(video) {
+    clearTimeout(this.retourContinu);
     if (this.flux) this.flux.getTracks().forEach((t) => t.stop());
     this.flux = null;
     if (video) video.srcObject = null;

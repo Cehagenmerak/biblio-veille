@@ -979,8 +979,11 @@ async function ouvrirScan(mode) {
   const z = S.caps.zoom;
   $("zoom-ligne").hidden = !z;
   if (z) {
-    Object.assign($("zoom"), { min: z.min, max: Math.min(z.max, z.min * 8), step: z.step || 0.1, value: z.min });
-    $("zoom-val").textContent = "×" + (+z.min).toLocaleString("fr-FR");
+    // Zoom de départ ×1,5 : on tient le téléphone plus loin, hors de la distance minimale de mise au point.
+    const depart = Math.min(Math.max(z.min, CONFIG.zoomDepart), z.max);
+    Object.assign($("zoom"), { min: z.min, max: Math.min(z.max, z.min * 8), step: z.step || 0.1, value: depart });
+    Camera.zoom(depart);
+    $("zoom-val").textContent = "×" + depart.toLocaleString("fr-FR", { maximumFractionDigits: 1 });
   }
   $("btn-torche").disabled = !S.caps.torche;
   S.actif = true;
@@ -1210,6 +1213,23 @@ $("btn-torche").addEventListener("click", () => {
 $("zoom").addEventListener("input", (e) => {
   Camera.zoom(+e.target.value);
   $("zoom-val").textContent = "×" + (+e.target.value).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+});
+// Toucher l'image force la mise au point à cet endroit (les boutons et le zoom ne comptent pas).
+$("scanner").addEventListener("click", async (e) => {
+  if (!S.actif || S.pileFigee || e.target.closest("button, input, .scan-bas, .scan-haut")) return;
+  const r = video.getBoundingClientRect(), sw = video.videoWidth, sh = video.videoHeight;
+  if (!sw) return;
+  const k = Math.max(r.width / sw, r.height / sh);
+  const px = e.clientX - r.left, py = e.clientY - r.top;
+  const x = (px - (r.width - sw * k) / 2) / (sw * k), y = (py - (r.height - sh * k) / 2) / (sh * k);
+  const anneau = document.createElement("div");
+  anneau.className = "anneau-focus";
+  anneau.style.left = px + "px";
+  anneau.style.top = py + "px";
+  $("scanner").appendChild(anneau);
+  setTimeout(() => anneau.remove(), 900);
+  const ok = await Camera.mettreAuPoint(Math.min(1, Math.max(0, x)), Math.min(1, Math.max(0, y)));
+  if (!ok) messageScan("Mise au point manuelle indisponible sur cet appareil.");
 });
 $("btn-isbn-clavier").addEventListener("click", () => {
   E.feuille = { type: "isbn", saisie: "" };

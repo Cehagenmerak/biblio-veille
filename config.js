@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.5.0";
+const VERSION_APP = "1.6.0";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",
@@ -92,4 +92,7 @@ const CONFIG = {
 
   // Mode « au kilomètre » : délai minimal entre deux lectures (ms).
   pauseKilometre: 1500,
+
+  // Zoom de la caméra à l'ouverture du scanner (ramené dans les limites de l'appareil).
+  zoomDepart: 1.5,
 };

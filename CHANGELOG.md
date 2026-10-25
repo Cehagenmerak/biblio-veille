@@ -14,6 +14,18 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.6.0] - 2026-10-25
+
+### Ajouté
+- **Mise au point au toucher** : toucher l'image du scanner force la mise au point (anneau blanc à
+  l'endroit touché), puis la mise au point continue reprend après 1,5 s. Sur les appareils qui ne
+  gèrent pas le choix du point, elle se fait au centre ; sur ceux qui ne la gèrent pas du tout,
+  un message le dit.
+
+### Modifié
+- **Zoom de départ ×1,5** (`zoomDepart` dans `config.js`) : on tient le téléphone plus loin du
+  code, hors de la distance minimale de mise au point. Le curseur permet de revenir à ×1.
+
 ## [1.5.0] - 2026-10-25
 
 ### Ajouté
