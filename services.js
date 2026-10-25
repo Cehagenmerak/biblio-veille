@@ -134,6 +134,7 @@ function chargerReglages() {
     pmbUrl: "", fondsMode: "both", theme: null, favs,
     groupe: "none", formatMail: "html", afficherEnvoyes: false,
     ...r,
+    sources: sourcesReglees(r.sources),
   };
 }
 
@@ -294,6 +295,74 @@ function lireUnimarc(rec) {
   for (const k of Object.keys(d)) if (!d[k]) delete d[k];
   return d;
 }
+
+// ---------- Sudoc : catalogue collectif, notice UNIMARC lue par son PPN ----------
+
+// Renvoie { statut: "found" | "notfound" | "error", data? }, comme interrogerBnf.
+async function interrogerSudoc(isbn) {
+  const base = CONFIG.sudoc.base;
+  let ppn;
+  try {
+    const r = await fetch(`${base}/services/isbn2ppn/${encodeURIComponent(isbn)}`, { signal: AbortSignal.timeout(15000) });
+    if (r.status === 404) return { statut: "notfound" };
+    if (!r.ok) return { statut: "error" };
+    const xml = new DOMParser().parseFromString(await r.text(), "application/xml");
+    ppn = (xml.getElementsByTagName("ppn")[0]?.textContent || "").trim();
+  } catch {
+    return { statut: "error" };
+  }
+  if (!/^\d{8}[\dX]$/.test(ppn)) return { statut: "notfound" };
+  try {
+    const r = await fetch(`${base}/${ppn}.xml`, { signal: AbortSignal.timeout(15000) });
+    if (!r.ok) return { statut: "error" };
+    const xml = new DOMParser().parseFromString(await r.text(), "application/xml");
+    const notice = xml.getElementsByTagName("record")[0];
+    if (!notice) return { statut: "error" };
+    const data = lireUnimarc(notice);
+    delete data.ark; // pas de couverture : un lien BnF éventuel de la notice n'est pas celui de cette édition
+    return data.titre ? { statut: "found", data } : { statut: "notfound" };
+  } catch {
+    return { statut: "error" };
+  }
+}
+
+// ---------- Sources de complément : essayées dans l'ordre choisi dans Réglages ----------
+
+const SOURCES = {
+  bnf: { nom: "BnF", detail: "Catalogue général : la référence, avec les parutions du dépôt légal.", interroger: interrogerBnf },
+  sudoc: {
+    nom: "Sudoc",
+    detail: "Catalogue collectif des bibliothèques de l'enseignement supérieur : prend le relais quand la BnF ne trouve rien.",
+    interroger: interrogerSudoc,
+  },
+};
+
+// Ordre et activation enregistrés, complétés des sources connues (une nouvelle source arrive en dernier, active).
+function sourcesReglees(sources) {
+  const vues = new Set();
+  const liste = [];
+  for (const s of Array.isArray(sources) ? sources : []) {
+    if (!SOURCES[s?.id] || vues.has(s.id)) continue;
+    vues.add(s.id);
+    liste.push({ id: s.id, on: s.on !== false });
+  }
+  for (const id of Object.keys(SOURCES)) if (!vues.has(id)) liste.push({ id, on: true });
+  return liste;
+}
+
+// Première source qui trouve le livre ; sinon « erreur » si l'une n'a pas répondu, « introuvable » si toutes ont répondu non.
+async function interrogerSources(isbn, sources) {
+  let erreur = false;
+  for (const s of sources) {
+    if (!s.on || !SOURCES[s.id]) continue;
+    const res = await SOURCES[s.id].interroger(isbn);
+    if (res.statut === "found") return { ...res, source: s.id };
+    if (res.statut === "error") erreur = true;
+  }
+  return { statut: erreur ? "error" : "notfound" };
+}
+
+const nomSource = (l) => SOURCES[l.bnfSource]?.nom || "BnF";
 
 // Vérifie qu'une couverture existe (l'image se charge et n'est pas un pixel vide).
 function testerCouverture(url) {

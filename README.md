@@ -10,10 +10,12 @@ Application web installable (PWA), sans serveur ni compte : les données restent
 - **Fiche** : Titre, Auteur, Public, Cote, Motif d'office ; Éditeur, Prix indicatif, Commentaire en favoris ; photo de couverture réduite à 800 px.
 - **Priorité** : balayer une ligne vers la droite (monte) ou la gauche (baisse) : À voir, Intéressant, Indispensable.
 - **BnF** : complète les champs vides (SRU du Catalogue général) et récupère la couverture, livre par livre ou en lot.
+- **Sudoc** : prend le relais quand la BnF ne trouve rien (ISBN vers PPN, notice UNIMARC), sans couverture. Les deux sources s'activent, se coupent et se classent dans Réglages > Sources de complément.
 - **Fonds PMB** : signale les livres déjà possédés, au scan et/ou avant l'envoi (adresse du connecteur dans Réglages).
 - **Envoi** : tableau HTML partagé vers la messagerie, ou texte simple ; les livres envoyés sont masqués mais toujours reconnus au scan. Biblio' Achats relève le mail tout seul à son ouverture.
 - **Archives** : les envois par date ; remettre un envoi à envoyer, ou le supprimer du téléphone pour faire de la place.
 - **Depuis un site de libraire** : l'extension Firefox Biblio' Veilleuse (dossier `../extension-firefox/` du workspace) ouvre l'appli sur `#ajout?isbn=…&titre=…` ; le livre est ajouté et sa fiche s'ouvre.
+  Sur la page d'une série, elle propose le lot : `#lot?d=…` ajoute tous les livres cochés à la liste, sans ouvrir de fiche.
 
 ## Format du mail
 L'outil d'acquisitions de la bibliothèque lit ce mail : ne pas changer ce format sans adapter son lecteur (`veille.py`).

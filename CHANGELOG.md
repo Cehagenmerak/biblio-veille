@@ -14,6 +14,29 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.5.0] - 2026-10-25
+
+### Ajouté
+- **Le Sudoc prend le relais quand la BnF ne trouve rien.** L'ISBN donne un numéro de notice
+  (`isbn2ppn`), la notice UNIMARC se lit sur `sudoc.fr` et passe par le même lecteur que la BnF :
+  titre, auteur, éditeur, date, collection, prix. Pas de couverture (le Sudoc n'en donne pas).
+- **Réglages : « Sources de complément »** : chaque source s'active ou se coupe, et l'ordre se
+  change (▲). Les sources sont essayées dans l'ordre, la première qui trouve le livre l'emporte.
+  Seul l'ISBN est envoyé. Les champs complétés portent l'étiquette de leur source (BnF ou Sudoc).
+
+### Modifié
+- Les textes de la fiche et de la liste parlent des « catalogues » au lieu de la seule BnF
+  (« Trouvé Sudoc », « Compléter par les catalogues »).
+
+## [1.4.0] - 2026-10-25
+
+### Ajouté
+- **Lot de livres** envoyé par Biblio' Veilleuse (`#lot?d=…`) : sur la page d'une série (Bédéthèque…),
+  l'extension liste les albums, les fait cocher et modifier en masse, puis les envoie d'un coup.
+  Les livres s'ajoutent à la liste sans ouvrir de fiche, dans l'ordre de la série (le premier tome
+  en tête), la BnF complète le reste. Un ISBN déjà dans la liste est compté et ignoré. La série et le
+  tome vont en commentaire, avec le site, le rayon, la collection et le format.
+
 ## [1.3.0] - 2026-10-19
 
 ### Ajouté

@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.3.0";
+const VERSION_APP = "1.5.0";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",
@@ -75,6 +75,12 @@ const CONFIG = {
   bnf: {
     base: "https://catalogue.bnf.fr",
     couvertures: true,
+  },
+
+  // Sudoc (ABES) : prend le relais quand la BnF ne trouve rien. L'ISBN donne un numéro de notice
+  // (PPN), la notice se lit en UNIMARC. Le serveur répond aux appels du navigateur (CORS).
+  sudoc: {
+    base: "https://www.sudoc.fr",
   },
 
   // PMB : connecteur sortant JSON-RPC. Méthode et type de recherche à confirmer

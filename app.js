@@ -96,15 +96,16 @@ function bip(double) {
 
 const ETATS_BNF = {
   none: ["À interroger", "var(--ink2)"],
-  loading: ["BnF en cours…", "var(--pri-ink)"],
+  loading: ["Recherche…", "var(--pri-ink)"],
   found: ["Trouvé BnF", "var(--ok)"],
   notfound: ["Introuvable", "var(--warn)"],
   error: ["Erreur réseau", "var(--err)"],
   na: ["Sans ISBN", "var(--ink2)"],
 };
-function puceBnf(st, libelle) {
+function puceBnf(st, libelle, source) {
   const [l, c] = ETATS_BNF[st] || ETATS_BNF.none;
-  return `<span class="puce${st === "loading" ? " loading" : ""}" style="--c:${c}">${esc(libelle || l)}</span>`;
+  const texte = libelle || (st === "found" && source ? "Trouvé " + (SOURCES[source]?.nom || "BnF") : l);
+  return `<span class="puce${st === "loading" ? " loading" : ""}" style="--c:${c}">${esc(texte)}</span>`;
 }
 function barresPrio(p) {
   return `<div class="prio-barres" aria-label="Priorité : ${PRIO[p]}">${[1, 2, 3]
@@ -190,7 +191,7 @@ function vueListe() {
   const b = E.bandeau;
   if (b) {
     h += `<div class="bandeau"><div class="bandeau-l1"><div class="bandeau-titre">${
-      b.running ? `Interrogation BnF… ${b.done}/${b.total}` : `BnF : ${b.total} livre${pl(b.total)} interrogé${pl(b.total)}`
+      b.running ? `Interrogation des catalogues… ${b.done}/${b.total}` : `Catalogues : ${b.total} livre${pl(b.total)} interrogé${pl(b.total)}`
     }</div>${b.running ? "" : `<button class="bandeau-ok" data-a="fermerBandeau">OK</button>`}</div>${
       b.running
         ? `<div class="bandeau-barre"><div style="width:${Math.max(6, (b.done / b.total) * 100)}%"></div></div>`
@@ -246,7 +247,7 @@ function vueListe() {
   } else {
     const nIsbn = tous.filter((l) => sel.has(l.id) && l.isbn).length;
     h += `<div class="pied-sel">
-      <button class="btn btn-pri" data-a="bnfSel" ${nSel ? "" : "disabled"}>Interroger la BnF (${nIsbn})</button>
+      <button class="btn btn-pri" data-a="bnfSel" ${nSel ? "" : "disabled"}>Compléter par les catalogues (${nIsbn})</button>
       <div class="grille2">
         <button class="btn" data-a="envoyer" ${nSel ? "" : "disabled"}>Envoyer la sélection</button>
         <button class="btn btn-danger" data-a="supprSel" ${nSel ? "" : "disabled"}>Supprimer</button>
@@ -320,7 +321,7 @@ function vueLigne(l) {
       ${sous ? `<div class="ligne-sous">${esc(sous)}</div>` : ""}
       <div class="ligne-meta">${barresPrio(l.prio)}${l.prio === 3 ? `<span class="tag-indisp">Indispensable</span>` : ""}<span class="mono">${esc(meta)}</span></div>
     </div>
-    <div class="ligne-etats">${puceBnf(l.bnf)}${l.fonds ? `<span class="puce puce-fonds">Au fonds</span>` : ""}${l.sent ? `<span class="envoye">envoyé</span>` : ""}</div>
+    <div class="ligne-etats">${puceBnf(l.bnf, null, l.bnfSource)}${l.fonds ? `<span class="puce puce-fonds">Au fonds</span>` : ""}${l.sent ? `<span class="envoye">envoyé</span>` : ""}</div>
   </div></div>`;
 }
 
@@ -414,12 +415,12 @@ document.addEventListener("pointercancel", finGeste);
 // ---------- Fiche ----------
 
 const TEXTES_BNF = {
-  none: ["Non interrogé", "La BnF complétera les champs vides. Possible plus tard, en wifi.", "Interroger la BnF"],
-  loading: ["Interrogation en cours…", "Recherche dans le catalogue de la BnF.", null],
+  none: ["Non interrogé", "Les catalogues (BnF, Sudoc) complèteront les champs vides. Possible plus tard, en wifi.", "Compléter par les catalogues"],
+  loading: ["Interrogation en cours…", "Recherche dans les catalogues de la BnF et du Sudoc.", null],
   found: ["Trouvé à la BnF", "Champs vides complétés. Vos saisies ne sont jamais écrasées.", "Relancer"],
-  notfound: ["Introuvable à la BnF", "Cet ISBN n'est pas (encore) au catalogue, fréquent pour une parution récente.", "Réessayer"],
-  error: ["Erreur réseau", "Pas de connexion, ou la BnF n'a pas répondu. Réessayez plus tard, en wifi.", "Réessayer"],
-  na: ["Sans ISBN", "L'interrogation BnF nécessite un ISBN.", null],
+  notfound: ["Introuvable", "Cet ISBN n'est pas (encore) dans les catalogues interrogés, fréquent pour une parution récente.", "Réessayer"],
+  error: ["Erreur réseau", "Pas de connexion, ou un catalogue n'a pas répondu. Réessayez plus tard, en wifi.", "Réessayer"],
+  na: ["Sans ISBN", "L'interrogation des catalogues nécessite un ISBN.", null],
 };
 
 function champsAffiches(l) {
@@ -430,7 +431,8 @@ function vueFiche() {
   const l = livre(E.ficheId);
   const brouillon = !!l.draft;
   const etat = l.isbn ? l.bnf : "na";
-  const [bTitre, bDesc, bBtn] = TEXTES_BNF[etat];
+  const [titreBnf, bDesc, bBtn] = TEXTES_BNF[etat];
+  const bTitre = etat === "found" ? "Trouvé " + (l.bnfSource === "sudoc" ? "au Sudoc" : "à la BnF") : titreBnf;
   let h = `<div class="barre-haut">
     <button class="btn-lien" data-a="${brouillon ? "ficheAnnuler" : "ficheRetour"}">← ${E.retour === "archives" ? "Archives" : "Liste"}</button>
     <div class="titre">${brouillon ? "Nouveau livre" : "Fiche du livre"}</div>
@@ -480,7 +482,7 @@ function vueFiche() {
     const couv = couvBnf(l);
     h += `<div class="couv-ligne">${
       couv ? `<img class="couv-img" src="${esc(couv)}" alt="Couverture BnF">` : `<div class="couv-vide"></div>`
-    }<div class="couv-txt"><b>${couv ? "Couverture BnF récupérée" : "Pas de couverture à la BnF"}</b><span>${
+    }<div class="couv-txt"><b>${couv ? "Couverture BnF récupérée" : l.bnfSource === "sudoc" ? "Le Sudoc ne donne pas de couverture" : "Pas de couverture à la BnF"}</b><span>${
       couv ? (l.photo ? "Votre photo est prioritaire dans le mail." : "Affichée en vignette dans le mail, en lien (0 Ko).") : "Fréquent pour une parution récente. Prenez une photo ci-dessus."
     }</span></div></div>`;
   }
@@ -492,7 +494,7 @@ function vueFiche() {
     const bv = l.bnfData && l.bnfData[c.id];
     const sugg = !!bv && !!v && l.src[c.id] !== "bnf" && norm(bv) !== norm(v) && !l.dismissed[c.id];
     h += `<div class="bloc" data-champ="${c.id}"><div class="champ-tete"><label class="lib-champ" for="f-${c.id}">${esc(c.label)}</label>${
-      l.src[c.id] === "bnf" && v ? `<span class="tag-bnf">BnF</span>` : ""
+      l.src[c.id] === "bnf" && v ? `<span class="tag-bnf">${esc(nomSource(l))}</span>` : ""
     }${!c.toujours && R.favs[c.id] ? `<span class="tag-fav">★ toujours affiché</span>` : ""}<div class="esp"></div>${
       !c.toujours && !R.favs[c.id] ? `<button class="btn-retirer-champ" data-a="retirerChamp" data-k="${c.id}">Retirer</button>` : ""
     }</div>`;
@@ -509,8 +511,8 @@ function vueFiche() {
       h += `<input id="f-${c.id}" class="champ-saisie" value="${esc(v)}" placeholder="${esc(c.placeholder || "")}" data-i="champ" data-k="${c.id}" autocomplete="off">`;
     }
     if (sugg) {
-      h += `<div class="suggestion"><div class="txt"><b>La BnF indique :</b> ${esc(bv)}</div><div class="grille2">
-        <button class="utiliser" data-a="utiliserBnf" data-k="${c.id}">Utiliser la BnF</button>
+      h += `<div class="suggestion"><div class="txt"><b>${esc(nomSource(l))} indique :</b> ${esc(bv)}</div><div class="grille2">
+        <button class="utiliser" data-a="utiliserBnf" data-k="${c.id}">Utiliser ${esc(nomSource(l))}</button>
         <button class="garder" data-a="garderMienne" data-k="${c.id}">Garder la mienne</button></div></div>`;
     }
     h += `</div>`;
@@ -574,6 +576,13 @@ function vueReglages() {
       <div class="note">Signale les livres que la bibliothèque possède déjà. Nécessite le réseau.</div>
     </div>
     <div class="section">
+      <div class="section-titre">Sources de complément</div>
+      <div class="liste-champs">${R.sources.map((s, i) => `<div class="champ-ligne"><div style="flex:1;min-width:0"><div class="nom">${i + 1}. ${esc(SOURCES[s.id].nom)}</div><div class="desc" style="white-space:normal">${esc(SOURCES[s.id].detail)}</div></div>${
+        i > 0 ? `<button class="btn-test" data-a="sourceMonter" data-k="${s.id}" aria-label="Interroger ${esc(SOURCES[s.id].nom)} avant la précédente">▲</button>` : ""
+      }<button class="btn-test" data-a="sourceActive" data-k="${s.id}" aria-pressed="${s.on}">${s.on ? "Active" : "Coupée"}</button></div>`).join("")}</div>
+      <div class="note">Essayées dans cet ordre, jusqu'à la première qui trouve le livre. Elles complètent les champs vides : vos saisies ne sont jamais écrasées. Seul l'ISBN est envoyé.</div>
+    </div>
+    <div class="section">
       <div class="section-titre">Thème</div>
       <div class="segments" style="grid-template-columns:1fr 1fr">
         ${seg(!sombre, "theme", "Clair", 'data-v="light"')}
@@ -588,7 +597,7 @@ function vueReglages() {
         const desc =
           c.id === "cote" ? `Liste de ${COTES.length} cotes, filtrée selon le public`
           : c.type === "select" ? `Liste : ${(c.options || []).join(", ")}`
-          : ["titre", "auteur", "editeur", "prix", "illustrateur"].includes(c.id) ? "Texte · complété par la BnF"
+          : ["titre", "auteur", "editeur", "prix", "illustrateur"].includes(c.id) ? "Texte · complété par les catalogues"
           : "Texte libre";
         return `<div class="champ-ligne"><div style="flex:1;min-width:0"><div class="nom">${esc(c.label)}</div><div class="desc">${esc(desc)}</div></div>${
           c.toujours
@@ -619,7 +628,7 @@ function vueFeuille() {
             : "Ce livre a déjà été scanné : rien n'a été ajouté."
           : f.genre === "fonds"
           ? `Catalogue PMB : ${l.fondsInfo || ""}. Gardé dans la liste et signalé « Au fonds ».`
-          : l.fields.titre || "Titre et auteur facultatifs : la BnF pourra les compléter plus tard.";
+          : l.fields.titre || "Titre et auteur facultatifs : les catalogues pourront les compléter plus tard.";
       const couleur = { dup: "var(--warn)", fonds: "var(--fonds)", new: "var(--ok)" }[f.genre];
       const btn = { dup: "Ouvrir la fiche", fonds: "Retirer de la liste", new: "+ Titre / auteur" }[f.genre];
       return `<div class="confirm-tete"><div class="confirm-rond" style="background:${couleur}">${f.genre === "new" ? "✓" : "!"}</div>
@@ -873,10 +882,11 @@ async function partager() {
   if (R.email && ouvrirMailto()) demanderSiParti();
 }
 
-// ---------- BnF ----------
+// ---------- Catalogues : BnF, puis Sudoc ----------
 
 async function interrogerLot(ids, avecBandeau) {
-  if (!navigator.onLine) toast("Pas de réseau : la BnF sera interrogée plus tard, en wifi.");
+  if (!navigator.onLine) toast("Pas de réseau : les catalogues seront interrogés plus tard, en wifi.");
+  if (!R.sources.some((x) => x.on)) return toast("Aucune source de complément active : voir Réglages.");
   const cibles = livres.filter((l) => ids.includes(l.id) && l.isbn && l.bnf !== "loading").map((l) => l.id);
   if (!cibles.length) return toast("Aucun ISBN à interroger");
   for (const id of cibles) maj(id, (l) => (l.bnf = "loading"));
@@ -885,11 +895,12 @@ async function interrogerLot(ids, avecBandeau) {
   for (const id of cibles) {
     const l = livre(id);
     if (!l) continue;
-    const res = navigator.onLine ? await interrogerBnf(l.isbn) : { statut: "error" };
+    const res = navigator.onLine ? await interrogerSources(l.isbn, R.sources) : { statut: "error" };
     let couv = false;
     if (res.statut === "found" && CONFIG.bnf.couvertures && res.data.ark) couv = await testerCouverture(urlCouvertureBnf(res.data.ark));
     maj(id, (x) => {
       x.bnf = res.statut;
+      x.bnfSource = res.statut === "found" ? res.source : null;
       if (res.statut !== "found") return;
       x.bnfData = res.data;
       x.cover = couv;
@@ -1481,6 +1492,16 @@ const ACTIONS = {
     R.favs[el.dataset.k] = !R.favs[el.dataset.k];
     sauverR();
   },
+  sourceActive: (el) => {
+    const s = R.sources.find((x) => x.id === el.dataset.k);
+    if (s) s.on = !s.on;
+    sauverR();
+  },
+  sourceMonter: (el) => {
+    const i = R.sources.findIndex((x) => x.id === el.dataset.k);
+    if (i > 0) [R.sources[i - 1], R.sources[i]] = [R.sources[i], R.sources[i - 1]];
+    sauverR();
+  },
 };
 
 document.addEventListener("click", (e) => {
@@ -1575,7 +1596,7 @@ document.addEventListener("input", (e) => {
         champ.closest(".bloc").querySelector(".tag-bnf")?.remove();
       }
     }
-    Object.assign(l, { isbn: v, bnf: v ? "none" : "na", bnfData: null, cover: null, fonds: null, fondsInfo: null, dismissed: {} });
+    Object.assign(l, { isbn: v, bnf: v ? "none" : "na", bnfSource: null, bnfData: null, cover: null, fonds: null, fondsInfo: null, dismissed: {} });
     if (!l.draft) sauver();
   } else if (i === "isbnTape") {
     const v = el.value.replace(/[^0-9]/g, "").slice(0, 13);
@@ -1646,13 +1667,70 @@ function ajoutDepuisAdresse() {
   toast(`Livre ajouté${site ? " depuis " + site : ""}`);
   return true;
 }
-window.addEventListener("hashchange", () => ajoutDepuisAdresse() && render());
+
+// ---------- Lot de livres envoyé par l'extension Firefox (une série, une liste) ----------
+// Adresse : …/index.html#lot?d=… (JSON en UTF-8, en base64 pour adresse ; voir envoi.js de l'extension).
+// Les livres sont ajoutés à la liste sans ouvrir de fiche, dans l'ordre reçu ; la BnF complète le reste.
+
+function lotDepuisAdresse() {
+  const h = location.hash;
+  if (!h.startsWith("#lot?")) return false;
+  history.replaceState(null, "", location.pathname + location.search);
+  let lot;
+  try {
+    const b64 = (new URLSearchParams(h.slice(5)).get("d") || "").replace(/-/g, "+").replace(/_/g, "/");
+    lot = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))));
+    if (!Array.isArray(lot.livres)) throw new Error("pas de livres");
+  } catch {
+    toast("Lot illisible : rien n'a été ajouté.");
+    return true;
+  }
+  const g = (x, k) => String((x && x[k]) ?? "").trim().slice(0, 300);
+  let site = "";
+  try {
+    site = g(lot, "page") ? new URL(g(lot, "page")).hostname.replace(/^www\./, "") : "";
+  } catch {}
+  const t0 = Date.now();
+  const ids = [];
+  let doublons = 0;
+  for (const x of lot.livres.slice(0, 200)) {
+    const isbn = g(x, "isbn").replace(/[^0-9Xx]/g, "");
+    const ok = !!isbn && isbnValide(isbn);
+    if (ok && livres.some((l) => l.isbn === isbn && !l.draft)) {
+      doublons++;
+      continue;
+    }
+    if (!ok && !g(x, "titre")) continue;
+    const l = nouveauLivre(ok ? isbn : "", ok ? {} : { manual: true });
+    l.ts = t0 - ids.length; // le premier du lot reste en tête de liste
+    for (const k of ["titre", "auteur", "editeur", "prix"]) {
+      if (g(x, k)) (l.fields[k] = g(x, k)), (l.src[k] = "user");
+    }
+    if (PUBLICS.includes(g(x, "public"))) (l.fields.public = g(x, "public")), (l.src.public = "user");
+    if (COTES.some((c) => c.v === g(x, "cote"))) (l.fields.cote = g(x, "cote")), (l.src.cote = "user");
+    const note = [site && "Repéré sur " + site, g(x, "serie") && "série " + g(x, "serie") + (g(x, "tome") ? ", tome " + g(x, "tome") : ""),
+      g(x, "parution") && "parution " + g(x, "parution"), g(lot, "rayon") && "rayon : " + g(lot, "rayon"),
+      g(x, "collection") && "collection " + g(x, "collection"), g(x, "format")].filter(Boolean).join(" · ");
+    if (note) (l.fields.commentaire = note), (l.src.commentaire = "user");
+    livres.push(l);
+    ids.push(l.id);
+  }
+  sauver();
+  Object.assign(E, { ecran: "liste", ficheId: null, ficheErr: null, feuille: null, retour: null });
+  if (ids.length) interrogerLot(ids, true);
+  const pl = (n) => (n > 1 ? "s" : "");
+  toast(ids.length
+    ? `${ids.length} livre${pl(ids.length)} ajouté${pl(ids.length)}${doublons ? `, ${doublons} déjà dans la liste` : ""}`
+    : doublons ? "Ces livres sont déjà dans la liste." : "Rien de reconnu dans ce lot.");
+  return true;
+}
+window.addEventListener("hashchange", () => (ajoutDepuisAdresse() || lotDepuisAdresse()) && render());
 
 // ---------- Démarrage ----------
 
 appliquerTheme();
 sauver(); // enregistre la conversion depuis la première version, le cas échéant
-ajoutDepuisAdresse();
+ajoutDepuisAdresse() || lotDepuisAdresse();
 render();
 
 if ("serviceWorker" in navigator) {
