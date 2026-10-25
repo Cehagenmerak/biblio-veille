@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.6.1";
+const VERSION_APP = "1.7.0";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",
@@ -38,11 +38,13 @@ const CONFIG = {
   favorisParDefaut: ["editeur", "prix", "commentaire"],
 
   // Cotes PMB : [cote, libellé, public]. Public null = « à déterminer » (pas de filtre).
-  // Alignées le 19 octobre 2026 sur referentiels/cotes.csv de Biblio' Achats (mangas par âge, E1DOC).
+  // Alignées le 19 octobre 2026 sur referentiels/cotes.csv de Biblio' Achats (mangas par âge, E1DOC),
+  // RROM (romance et dark romance, adulte seulement) ajoutée le 25 octobre 2026.
   cotes: [
     ["R", "Roman adulte", "Adulte"],
     ["RX", "Roman policier adulte", "Adulte"],
     ["RSF", "Roman science-fiction adulte", "Adulte"],
+    ["RROM", "Romance et dark romance adulte", "Adulte"],
     ["ABD", "Bande dessinée adulte", "Adulte"],
     ["DOC", "Documentaire adulte", "Adulte"],
     ["GC", "Gros caractères", "Adulte"],

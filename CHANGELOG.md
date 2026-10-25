@@ -14,6 +14,12 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.7.0] - 2026-10-25
+
+### Ajouté
+- **Cote RROM** (romance et dark romance, adulte seulement), comme dans Biblio' Achats, où elle
+  partage le budget des romans adultes (section « R · RROM »). La romance ado reste en JR.
+
 ## [1.6.1] - 2026-10-25
 
 ### Modifié
