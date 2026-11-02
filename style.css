@@ -91,7 +91,9 @@ button:disabled { cursor: default; }
    Le compteur reste dessous, sur le fond de page. */
 .entete { color: var(--ink); }
 .entete .b-entete { padding-top: env(safe-area-inset-top); min-height: calc(56px + env(safe-area-inset-top)); }
-.btn-reglages { min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 10px; font-size: 15px; font-weight: 600; }
+.choix-theme { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.choix-theme label { display: flex; align-items: center; gap: 12px; min-height: 44px; font-size: 16px; }
+.choix-theme input { accent-color: var(--b-action); width: 20px; height: 20px; margin: 0; }
 .compteur { display: flex; align-items: baseline; gap: 8px; padding: 14px 16px 0; }
 .compteur-n { font: 400 36px/1 var(--marque); font-variant-numeric: lining-nums; }
 .compteur-l { font-size: 16px; }
@@ -138,7 +140,8 @@ button:disabled { cursor: default; }
 .envoi .grille2 { padding: 10px 14px 12px; }
 
 .liste { flex: 1; overflow-y: auto; background: var(--surface); border-top: 1px solid var(--line); overscroll-behavior: contain; }
-.liste-vide { padding: 32px 24px; text-align: center; color: var(--ink2); font-size: 15px; }
+.liste-vide { padding: 32px 24px; text-align: center; color: var(--ink); font-size: 16px; line-height: 1.5; }
+.pied-version { padding: 12px 16px 20px; text-align: center; font-size: 13px; color: var(--ink2); }
 .groupe-tete { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 8px 16px; background: var(--surface2); border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 700; color: var(--ink2); }
 .groupe-tete span:last-child { font-weight: 400; }
 .ligne-wrap { position: relative; overflow: hidden; background: var(--surface); }

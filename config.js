@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.7.1";
+const VERSION_APP = "1.8.0";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",

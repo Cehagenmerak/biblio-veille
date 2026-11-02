@@ -1,7 +1,7 @@
-/* Biblio' : jetons communs, niveau A (identité). Version finale du 18 octobre 2026.
+/* Biblio' : jetons communs, niveau A (identité). Version finale du 19 octobre 2026.
    Fichier à COPIER dans chaque appli, avec le dossier polices/ à côté. Aucune dépendance externe.
    Thème : suit le système ; forcé par <html data-theme="clair|sombre"> (voir biblio-theme.js).
-   Appli : <html data-appli="tour|veille|achats|bd|stats|archi|plan"> fixe --b-appli et --b-appli-texte. */
+   Appli : <html data-appli="tour|veille|achats|bd|stats|archi|plan"> fixe --b-appli, --b-appli-texte et --b-action. */
 
 @font-face { font-family: "Libre Bodoni"; font-weight: 400; font-style: normal; font-display: swap; src: url("polices/libre-bodoni-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Libre Bodoni"; font-weight: 400; font-style: italic; font-display: swap; src: url("polices/libre-bodoni-latin-400-italic.woff2") format("woff2"); }
@@ -51,14 +51,15 @@
   --b-gris: #8a8378;      /* filets et icônes, jamais du texte */
   --b-sur-aplat: #f6f3ec; /* texte posé sur une couleur d'appli ou d'action */
 
-  /* Action : un seul bleu */
+  /* Action : couleur de l'appli courante (--b-action, voir data-appli plus bas).
+     --b-bleu reste le bleu de Veille et de l'information, et l'action par défaut sans data-appli. */
   --b-bleu: #3767af;
-  --b-sur-bleu: #ffffff;
+  --b-sur-action: #ffffff; /* texte sur un bouton plein */
 
   /* États : texte et fond doux */
   --b-succes: #2c7e44;  --b-succes-fond: #e3efe3;
   --b-alerte: #8a5a00;  --b-alerte-fond: #f5ead2;
-  --b-erreur: #b42318;  --b-erreur-fond: #f6dfda;
+  --b-erreur: #a8162e;  --b-erreur-fond: #f7dee1;
   --b-info:   #3767af;  --b-info-fond:   #e1e8f3;
 
   /* Couleurs d'appli : aplat (tuile, écran de chargement, filet d'en-tête) et variante texte */
@@ -78,12 +79,12 @@
   --b-fond: #1a1714; --b-carte: #24201b; --b-papier: #2e2822; --b-filet: #3a342d;
   --b-encre: #f0ebe1; --b-texte: #d6cfc3; --b-discret: #a39a8c; --b-gris: #6e675d;
   --b-sur-aplat: #f6f3ec;
-  --b-bleu: #5788d3; --b-sur-bleu: #10151c;
+  --b-bleu: #5788d3; --b-sur-action: #10151c;
   --b-succes: #6dbb7f; --b-succes-fond: #1f2a20;
   --b-alerte: #d9a441; --b-alerte-fond: #2e2618;
-  --b-erreur: #e5766a; --b-erreur-fond: #33201c;
+  --b-erreur: #ee7480; --b-erreur-fond: #351d21;
   --b-info:   #6f9be0; --b-info-fond:   #1d2635;
-  --b-tour-texte: #cb6951; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #479283;
+  --b-tour-texte: #cd6e56; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #4d9587;
   --b-stats-texte: #2196a7; --b-archi-texte: #8b82aa; --b-plan-texte: #ae7e80;
   color-scheme: dark;
 }
@@ -92,12 +93,12 @@
     --b-fond: #1a1714; --b-carte: #24201b; --b-papier: #2e2822; --b-filet: #3a342d;
     --b-encre: #f0ebe1; --b-texte: #d6cfc3; --b-discret: #a39a8c; --b-gris: #6e675d;
     --b-sur-aplat: #f6f3ec;
-    --b-bleu: #5788d3; --b-sur-bleu: #10151c;
+    --b-bleu: #5788d3; --b-sur-action: #10151c;
     --b-succes: #6dbb7f; --b-succes-fond: #1f2a20;
     --b-alerte: #d9a441; --b-alerte-fond: #2e2618;
-    --b-erreur: #e5766a; --b-erreur-fond: #33201c;
+    --b-erreur: #ee7480; --b-erreur-fond: #351d21;
     --b-info:   #6f9be0; --b-info-fond:   #1d2635;
-    --b-tour-texte: #cb6951; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #479283;
+    --b-tour-texte: #cd6e56; --b-veille-texte: #5788d3; --b-achats-texte: #50a064; --b-bd-texte: #4d9587;
     --b-stats-texte: #2196a7; --b-archi-texte: #8b82aa; --b-plan-texte: #ae7e80;
     color-scheme: dark;
   }
@@ -113,6 +114,10 @@
 :root[data-appli="archi"]  { --b-appli: var(--b-archi);  --b-appli-texte: var(--b-archi-texte); }
 :root[data-appli="plan"]   { --b-appli: var(--b-plan);   --b-appli-texte: var(--b-plan-texte); }
 
+/* Action : boutons pleins et contour, liens, cases cochées, onglet actif, anneau de focus.
+   Toujours la variante texte de l'appli ; bleu si aucune appli n'est déclarée. */
+:root { --b-action: var(--b-appli-texte, var(--b-bleu)); }
+
 /* ---------- En-tête d'appli ---------- */
 .b-entete { display: flex; align-items: center; gap: 24px; min-height: 64px; padding: 0 24px;
   background: var(--b-carte); border-bottom: 1px solid var(--b-filet); box-shadow: inset 0 3px 0 var(--b-appli);
@@ -127,16 +132,16 @@
   color: var(--b-discret); text-decoration: none; border-bottom: 2px solid transparent; }
 .b-entete nav a[aria-current="page"] { color: var(--b-encre); border-bottom-color: var(--b-appli-texte); }
 .b-entete-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.b-bascule { width: 40px; height: 40px; border-radius: var(--b-rayon-rond); border: 1px solid var(--b-filet);
-  background: transparent; display: grid; place-items: center; cursor: pointer; }
-.b-bascule::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--b-encre);
-  background: linear-gradient(90deg, var(--b-encre) 50%, transparent 50%); }
+/* « Réglages » : bouton texte, dernier à droite. Le thème s'y règle (voir biblio-theme.js). */
+.b-reglages { height: 40px; padding: 0 14px; border: 0; border-radius: var(--b-rayon-2); background: transparent;
+  font: 500 15px var(--b-police-interface); color: var(--b-texte); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+.b-reglages:hover { background: var(--b-papier); color: var(--b-encre); }
 @media (max-width: 720px) {
   .b-entete { min-height: 56px; padding: 0 16px; gap: 12px; }
   .b-marque img { width: 28px; height: 28px; }
   .b-marque-biblio { font-size: 22px; }
   .b-entete nav { display: none; }      /* navigation en bas d'écran sur téléphone */
-  .b-bascule { width: 44px; height: 44px; }
+  .b-reglages { height: 44px; padding: 0 10px; }
 }
 
 /* ---------- Écran de chargement ---------- */
@@ -162,19 +167,96 @@
   :root:not([data-theme="clair"]) .b-chargement-barre::after { background: var(--b-appli-texte); }
 }
 @media (prefers-reduced-motion: reduce) { .b-chargement-barre::after { animation: none; width: 100%; } }
-@media print { .b-chargement, .b-bascule { display: none; } .b-entete { box-shadow: none; } }
+@media print { .b-chargement, .b-reglages { display: none; } .b-entete { box-shadow: none; } }
 
-/* Ajout Alcuin (18 octobre 2026) : « à l'impression, toujours clair ». Sans ce bloc,
+/* Ajout Alcuin (22 octobre 2026) : filet d'en-tête de 5 px (4 au téléphone), comme le demande
+   le contrat de cadre du niveau B ; la feuille de Design en était restée à 3 px. */
+.b-entete { box-shadow: inset 0 5px 0 var(--b-appli); }
+@media (max-width: 720px) { .b-entete { box-shadow: inset 0 4px 0 var(--b-appli); } }
+@media print { .b-entete { box-shadow: none; } }
+
+/* ---------- Ajout Alcuin (22 octobre 2026) : composants du contrat de cadre (niveau B) ----------
+   Mêmes éléments aux mêmes endroits dans toutes les applis (Contrat de cadre.dc.html). */
+
+/* 2 · Bandeau d'information : 40 px sur fond papier, texte 13 px ; le contexte à gauche, la fraîcheur à droite. Pas de bouton. */
+.b-info { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; min-height: 40px; padding: 6px 24px; box-sizing: border-box;
+  background: var(--b-papier); border-bottom: 1px solid var(--b-filet); font: 13px/1.4 var(--b-police-interface); color: var(--b-texte); }
+.b-info b { font-weight: 600; color: var(--b-encre); }
+.b-info-droite { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+@media (max-width: 720px) { .b-info { padding: 6px 16px; } .b-info-droite { margin-left: 0; } }
+
+/* 3 · Titre de page : Bodoni 40 (32 au téléphone), sous-titre discret, actions à droite (deux au plus). */
+.b-titre-page { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.b-titre { margin: 0; font: 400 var(--b-titre-1)/1.15 var(--b-police-marque); color: var(--b-encre); }
+.b-sous-titre { font-size: 15px; color: var(--b-discret); }
+.b-titre-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 720px) { .b-titre { font-size: var(--b-titre-2); } .b-titre-actions { margin-left: 0; } }
+
+/* Boutons : plein à la couleur d'action, contour, neutre. */
+.b-bouton { height: 40px; padding: 0 16px; border-radius: var(--b-rayon-2); border: 1.5px solid var(--b-action); box-sizing: border-box;
+  background: var(--b-action); color: var(--b-sur-action); font: 600 15px var(--b-police-interface); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; text-decoration: none; }
+.b-bouton:hover { filter: brightness(1.08); }
+.b-bouton-contour { background: transparent; color: var(--b-action); }
+.b-bouton-contour:hover { filter: none; background: var(--b-papier); }
+.b-bouton-neutre { background: var(--b-carte); color: var(--b-encre); border: 1px solid var(--b-filet); font-weight: 500; }
+.b-bouton-neutre:hover { filter: none; background: var(--b-papier); }
+.b-bouton-neutre[aria-expanded="true"] { border-color: var(--b-encre); }
+.b-bouton:disabled { opacity: .55; cursor: default; filter: none; }
+
+/* Pastilles d'état : rectangle de 24 px, Plex 13 demi-gras, texte d'état sur fond doux. Le point est réservé à ce qui se passe. */
+.b-pastille { height: 24px; padding: 0 8px; border-radius: var(--b-rayon-1); font: 600 13px var(--b-police-interface);
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.b-pastille-point::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.b-neutre { background: var(--b-papier); color: var(--b-texte); }
+.b-info-pastille { background: var(--b-info-fond); color: var(--b-info); }
+.b-succes-pastille { background: var(--b-succes-fond); color: var(--b-succes); }
+.b-alerte-pastille { background: var(--b-alerte-fond); color: var(--b-alerte); }
+.b-erreur-pastille { background: var(--b-erreur-fond); color: var(--b-erreur); }
+
+/* 5 · État vide : deux phrases (ce qui manque, puis le geste en citant le bouton), Plex 16 romain, centré. */
+.b-vide { padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+  font: 400 16px/1.5 var(--b-police-interface); color: var(--b-texte); }
+
+/* 6 · Pied de page : en fin de défilement, jamais fixe. */
+.b-pied { margin-top: auto; padding: 14px 24px 22px; border-top: 1px solid var(--b-filet); display: flex; flex-wrap: wrap; gap: 4px 16px;
+  font: 13px var(--b-police-interface); color: var(--b-discret); }
+.b-pied a { color: var(--b-discret); }
+
+/* 8 · Réglages : fenêtre portant l'aide et le thème. */
+.b-reglages-fenetre { width: min(480px, calc(100vw - 32px)); border: 1px solid var(--b-filet); border-radius: var(--b-rayon-3); padding: 0;
+  background: var(--b-carte); color: var(--b-encre); box-shadow: var(--b-ombre-2); font-family: var(--b-police-interface); }
+.b-reglages-fenetre::backdrop { background: rgba(26, 23, 20, .35); }
+.b-reglages-fenetre form { padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+.b-reglages-fenetre h2 { margin: 0; font: 400 var(--b-titre-2)/1.15 var(--b-police-marque); }
+.b-reglages-fenetre h3, .b-reglages-fenetre legend { margin: 0 0 6px; padding: 0; font: 600 12px var(--b-police-interface); letter-spacing: .08em;
+  text-transform: uppercase; color: var(--b-discret); }
+.b-reglages-fenetre p { margin: 0 0 6px; font-size: 15px; line-height: 1.5; color: var(--b-texte); }
+.b-reglages-fenetre fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.b-reglages-fenetre label { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; }
+.b-reglages-fenetre input[type="radio"] { accent-color: var(--b-action); width: 18px; height: 18px; margin: 0; }
+
+/* Applis d'ordinateur ouvertes sur téléphone : bandeau d'invitation, refermable et mémorisé (position 2 du contrat). */
+.b-bandeau-tel { display: none; }
+@media (max-width: 720px) {
+  .b-bandeau-tel:not([hidden]) { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; background: var(--b-papier);
+    border-bottom: 1px solid var(--b-filet); font: 14px/1.45 var(--b-police-interface); color: var(--b-encre); }
+  .b-bandeau-tel button { flex: none; height: 32px; padding: 0 10px; border: 0; background: none; font: 600 14px var(--b-police-interface);
+    color: var(--b-action); cursor: pointer; }
+}
+@media print { .b-pied, .b-bandeau-tel, .b-reglages-fenetre { display: none; } }
+
+/* Ajout Alcuin (18 octobre 2026, repris le 22) : « à l'impression, toujours clair ». Sans ce bloc,
    une page en sombre s'imprimait en sombre. :not(#b-x) donne à la règle le poids
    nécessaire pour passer devant les deux blocs sombres. */
 @media print {
   :root:not(#b-x) {
     --b-fond: #f6f3ec; --b-carte: #ffffff; --b-papier: #ebe5d9; --b-filet: #d9d2c4;
     --b-encre: #1a1714; --b-texte: #4a443c; --b-discret: #6e675d; --b-gris: #8a8378;
-    --b-bleu: #3767af; --b-sur-bleu: #ffffff;
+    --b-bleu: #3767af; --b-sur-action: #ffffff;
     --b-succes: #2c7e44; --b-succes-fond: #e3efe3;
     --b-alerte: #8a5a00; --b-alerte-fond: #f5ead2;
-    --b-erreur: #b42318; --b-erreur-fond: #f6dfda;
+    --b-erreur: #a8162e; --b-erreur-fond: #f7dee1;
     --b-info:   #3767af; --b-info-fond:   #e1e8f3;
     --b-tour-texte: #b05139; --b-veille-texte: #3767af; --b-achats-texte: #2c7e44; --b-bd-texte: #0a6355;
     --b-stats-texte: #007b8b; --b-archi-texte: #5a5176; --b-plan-texte: #8f6163;

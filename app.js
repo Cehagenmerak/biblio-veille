@@ -40,7 +40,7 @@ function supprimerLivres(ids) {
 // ---------- Thème ----------
 
 // Le choix clair / sombre est celui de la famille Biblio' (biblio-theme.js, clé « biblio-theme ») :
-// le bouton de l'en-tête et les Réglages écrivent au même endroit. Un ancien choix des Réglages
+// le choix se fait dans les Réglages (Comme l'appareil, Clair, Sombre). Un ancien choix des Réglages
 // (R.theme : light / dark) est repris une fois, puis oublié.
 function appliquerTheme() {
   if (!R.theme) return;
@@ -49,10 +49,6 @@ function appliquerTheme() {
   try { localStorage.setItem("biblio-theme", t); } catch (e) {}
   delete R.theme;
   sauverR();
-}
-function themeSombre() {
-  const t = document.documentElement.dataset.theme;
-  return t ? t === "sombre" : matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
 // ---------- Retours : message, bip, vibration ----------
@@ -168,7 +164,7 @@ function vueListe() {
     h += `<div class="entete">
       <header class="b-entete">
         <div class="b-marque"><img src="tuile-128.png" alt=""><span class="b-marque-texte"><span class="b-marque-biblio">Biblio’</span><span class="b-marque-appli">Veille</span></span></div>
-        <div class="b-entete-actions"><button class="btn-reglages" data-a="reglages">Réglages</button><button class="b-bascule" type="button"></button></div>
+        <div class="b-entete-actions"><button class="b-reglages" data-a="reglages">Réglages</button></div>
       </header>
       <div class="compteur"><span class="compteur-n">${nonEnvoyes.length}</span><span class="compteur-l">à envoyer</span><span class="compteur-t">/ ${tous.length} au total</span></div>
     </div>
@@ -215,7 +211,7 @@ function vueListe() {
 
   h += `<div class="liste" id="liste">`;
   if (!vis.length) {
-    h += `<div class="liste-vide">${tous.length ? "Tous les livres ont été envoyés." : "Aucun livre pour l'instant. Scannez un code-barres pour commencer."}</div>`;
+    h += `<div class="liste-vide">${tous.length ? "Tous les livres ont été envoyés." : "Aucun livre pour l'instant. Touchez « Un livre » pour scanner votre premier code-barres."}</div>`;
   }
   const nLab = (n) => `${n} livre${pl(n)}`;
   const tete = (lab, n) => `<div class="groupe-tete"><span>${esc(lab)}</span><span>${nLab(n)}</span></div>`;
@@ -237,7 +233,7 @@ function vueListe() {
       if (items.length) h += tete(pu || "Public non renseigné", items.length) + items.map(vueLigne).join("");
     }
   } else h += vis.map(vueLigne).join("");
-  h += `<div style="height:12px"></div></div>`;
+  h += `<div class="pied-version">Biblio’ Veille ${VERSION_APP}</div></div>`;
 
   if (!sel) {
     h += `<div class="pied">
@@ -550,7 +546,6 @@ function textePmb() {
 }
 
 function vueReglages() {
-  const sombre = themeSombre();
   const [pTxt, pCls] = textePmb();
   const n = visibles().length;
   return `<div class="ecran"><div class="barre-haut">
@@ -584,10 +579,11 @@ function vueReglages() {
     </div>
     <div class="section">
       <div class="section-titre">Thème</div>
-      <div class="segments" style="grid-template-columns:1fr 1fr">
-        ${seg(!sombre, "theme", "Clair", 'data-v="light"')}
-        ${seg(sombre, "theme", "Sombre", 'data-v="dark"')}
-      </div>
+      <fieldset class="choix-theme">
+        <label><input type="radio" name="b-theme" value="systeme"> Comme l'appareil</label>
+        <label><input type="radio" name="b-theme" value="clair"> Clair</label>
+        <label><input type="radio" name="b-theme" value="sombre"> Sombre</label>
+      </fieldset>
     </div>
     <div class="section">
       <div class="section-titre">Champs disponibles</div>
@@ -1511,10 +1507,6 @@ const ACTIONS = {
   fondsMode: (el) => {
     R.fondsMode = el.dataset.v;
     sauverR();
-  },
-  theme: (el) => {
-    R.theme = el.dataset.v;
-    appliquerTheme();
   },
   favori: (el) => {
     R.favs[el.dataset.k] = !R.favs[el.dataset.k];

@@ -14,6 +14,15 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.8.0] - 2026-11-02
+
+### Modifié
+- **Niveau B de l'harmonisation Biblio'** (retour de Claude Design du 22 octobre) : kit commun mis à jour
+  (action à la couleur de l'appli, composants du contrat de cadre). « Réglages » devient un bouton texte
+  sans contour ; le bouton de thème quitte l'en-tête et le thème se règle dans Réglages (Comme l'appareil,
+  Clair, Sombre, mémorisé comme dans les autres applis de la famille). État vide qui cite le bouton
+  « Un livre ». Pied de page « Biblio' Veille » avec la version, en fin de liste.
+
 ## [1.7.1] - 2026-10-29
 
 ### Modifié
