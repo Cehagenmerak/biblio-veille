@@ -14,6 +14,15 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.7.1] - 2026-10-29
+
+### Modifié
+- **La BD adulte reste BD** : la cote ABD disparaît de la liste, au profit de BD (décision du 29 octobre
+  2026). Une fiche déjà enregistrée sous ABD part toujours vers Biblio' Achats, qui la ramène à BD.
+- **Liste des cotes tirée du référentiel unique** (`projets/referentiel-cotes`) : même ordre que
+  Biblio' Achats, libellé d'E1DOC complété (« Premiers documentaires bébé »). Le bloc est généré, ne pas
+  le modifier à la main.
+
 ## [1.7.0] - 2026-10-25
 
 ### Ajouté

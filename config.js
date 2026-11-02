@@ -4,7 +4,7 @@
 // ils se saisissent dans Réglages et restent sur le téléphone.
 
 // Numéro de version (SemVer), le même que VERSION dans sw.js. Affiché dans Réglages.
-const VERSION_APP = "1.7.0";
+const VERSION_APP = "1.7.1";
 
 const CONFIG = {
   objetMail: "Veille acquisitions",
@@ -37,37 +37,37 @@ const CONFIG = {
   // Champs non obligatoires affichés d'office (modifiable ensuite dans Réglages, étoile).
   favorisParDefaut: ["editeur", "prix", "commentaire"],
 
+  // DEBUT cotes (généré par projets/referentiel-cotes/synchroniser.py, ne pas modifier à la main)
   // Cotes PMB : [cote, libellé, public]. Public null = « à déterminer » (pas de filtre).
-  // Alignées le 19 octobre 2026 sur referentiels/cotes.csv de Biblio' Achats (mangas par âge, E1DOC),
-  // RROM (romance et dark romance, adulte seulement) ajoutée le 25 octobre 2026.
   cotes: [
     ["R", "Roman adulte", "Adulte"],
     ["RX", "Roman policier adulte", "Adulte"],
     ["RSF", "Roman science-fiction adulte", "Adulte"],
     ["RROM", "Romance et dark romance adulte", "Adulte"],
-    ["ABD", "Bande dessinée adulte", "Adulte"],
-    ["DOC", "Documentaire adulte", "Adulte"],
+    ["BD", "Bande dessinée adulte", "Adulte"],
+    ["ABDM", "Manga adulte", "Adulte"],
     ["GC", "Gros caractères", "Adulte"],
-    ["EBD", "Bande dessinée enfant", "Enfant"],
-    ["ER", "Roman enfant", "Enfant"],
+    ["DOC", "Documentaire adulte", "Adulte"],
+    ["TER", "Terroir", "Adulte"],
     ["JR", "Roman ado", "Ado"],
     ["JRX", "Roman policier ado", "Ado"],
     ["JRSF", "Roman science-fiction ado", "Ado"],
     ["JBD", "Bande dessinée ado", "Ado"],
-    ["ABDM", "Manga adulte", "Adulte"],
     ["JBDM", "Manga ado", "Ado"],
-    ["EBDM", "Manga enfant", "Enfant"],
-    ["MAN", "Manga, âge à préciser", null],
+    ["ER", "Roman enfant", "Enfant"],
     ["ERX", "Roman policier enfant", "Enfant"],
     ["ERSF", "Roman science-fiction enfant", "Enfant"],
-    ["TER", "Terroir", "Adulte"],
+    ["EBD", "Bande dessinée enfant", "Enfant"],
+    ["EBDM", "Manga enfant", "Enfant"],
     ["EA", "Album enfant", "Enfant"],
     ["PL", "Première lecture", "Enfant"],
     ["EDOC", "Documentaire enfant", "Enfant"],
+    ["E1DOC", "Premiers documentaires bébé", "Bébé"],
     ["EABB", "Album bébé", "Bébé"],
-    ["E1DOC", "Premiers documentaires", "Bébé"],
+    ["MAN", "Manga, âge à préciser", null],
     ["ADET", "À déterminer", null],
   ],
+  // FIN cotes
 
   // Photo de couverture : réduite avant l'envoi (côté le plus long, en pixels ; qualité JPEG).
   photo: { taille: 800, qualite: 0.72 },
