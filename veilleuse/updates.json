@@ -1,0 +1,13 @@
+{
+  "addons": {
+    "biblio-veilleuse@parcay-meslay.fr": {
+      "updates": [
+        {
+          "version": "0.4.2",
+          "update_link": "https://cehagenmerak.github.io/biblio-veille/veilleuse/biblio-veilleuse-0.4.2.xpi",
+          "update_hash": "sha256:8f97d4db4f95d7eb13678458eeca47cae6f098ae4e81c1fb7313245d5f5af70e"
+        }
+      ]
+    }
+  }
+}
