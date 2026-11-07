@@ -14,7 +14,7 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
-## [1.10.0] - 2026-11-08
+## [1.10.0] - 2026-11-07
 
 ### Ajouté
 - **« Déjà connu de Biblio' Achats »** (vague 4 du portage en ligne d'Achats), quand la boîte de dépôt est
