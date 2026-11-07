@@ -14,6 +14,7 @@ const E = {
   ficheErr: null,
   bandeau: null, // progression de l'interrogation BnF en lot
   pmbEtat: "idle",
+  depotEtat: "idle",
 };
 
 function sauver() {
@@ -545,8 +546,83 @@ function textePmb() {
   return TEXTES_PMB[E.pmbEtat] || [R.pmbUrl.trim() ? "Non testé" : "Vérification désactivée", ""];
 }
 
+// ---------- Boîte de dépôt de Biblio' Achats (facultative) ----------
+// Réglée, « Envoyer » dépose les livres directement dans la boîte en ligne d'Achats, relevée par Achats
+// à son ouverture sur le poste. Le mail reste possible : c'est la voie des bibliothèques sans boîte.
+
+const DEPOT_PAQUET = 50;
+const TEXTES_DEPOT = {
+  testing: ["Essai…", "attente"],
+  ok: ["Code accepté", "ok"],
+  refused: ["Code refusé", "ko"],
+  bad: ["Adresse invalide (https:// requis)", "ko"],
+  unreachable: ["Boîte injoignable : adresse ou réseau", "ko"],
+  empty: ["Saisissez l'adresse et le code", "ko"],
+};
+// https obligatoire, sauf le service d'essai sur le poste (localhost).
+const adresseDepotValide = (u) => /^(https:\/\/\S+|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/\S*)?)$/.test(u);
+const depotRegle = () => adresseDepotValide(R.depotUrl.trim()) && !!R.depotCode.trim();
+const urlDepot = (chemin) => R.depotUrl.trim().replace(/\/+$/, "") + chemin;
+function texteDepot() {
+  return TEXTES_DEPOT[E.depotEtat] || [depotRegle() ? "Non testée" : "Boîte coupée : envoi par mail", ""];
+}
+
+async function testerDepot() {
+  if (!R.depotUrl.trim() || !R.depotCode.trim()) return "empty";
+  if (!adresseDepotValide(R.depotUrl.trim())) return "bad";
+  try {
+    const r = await fetch(urlDepot("/api/code"), { headers: { "X-Code": R.depotCode.trim() }, cache: "no-store" });
+    return r.ok ? "ok" : r.status === 401 ? "refused" : "unreachable";
+  } catch {
+    return "unreachable";
+  }
+}
+
+// Dépose par paquets de 50 ; chaque paquet accepté est marqué « envoyé » aussitôt.
+async function deposerAchats() {
+  const f = E.feuille;
+  if (!f || f.type !== "envoi" || f.depot === "encours") return;
+  const { eff } = livresEnvoi(f);
+  if (!eff.length) return;
+  f.depot = "encours";
+  f.depotErreur = "";
+  renderFeuille();
+  const quand = Date.now();
+  let faits = 0;
+  try {
+    for (let i = 0; i < eff.length; i += DEPOT_PAQUET) {
+      const paquet = eff.slice(i, i + DEPOT_PAQUET);
+      const corps = { source: "veille", livres: paquet.map(donneesLivre) };
+      if (R.depotPar.trim()) corps.par = R.depotPar.trim();
+      let r;
+      try {
+        r = await fetch(urlDepot("/api/depot"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Code": R.depotCode.trim() },
+          body: JSON.stringify(corps),
+        });
+      } catch {
+        throw new Error(navigator.onLine ? "Boîte de dépôt injoignable." : "Pas de réseau.");
+      }
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).erreur || `Réponse ${r.status} de la boîte.`);
+      for (const l of paquet) maj(l.id, (x) => ((x.sent = true), (x.sentAt = quand), (x.sentVia = "depot")));
+      faits += paquet.length;
+    }
+  } catch (e) {
+    if (E.feuille !== f) return render();
+    f.depot = null;
+    f.depotErreur = (faits ? `${faits} livre${pl(faits)} déposé${pl(faits)}, puis : ` : "") + e.message + " Le mail reste possible.";
+    return render();
+  }
+  if (E.feuille === f) E.feuille = null;
+  E.sel = null;
+  toast(`${faits} livre${pl(faits)} déposé${pl(faits)} dans Biblio' Achats`);
+  render();
+}
+
 function vueReglages() {
   const [pTxt, pCls] = textePmb();
+  const [dTxt, dCls] = texteDepot();
   const n = visibles().length;
   return `<div class="ecran"><div class="barre-haut">
     <button class="btn-lien" data-a="liste">← Liste</button>
@@ -556,6 +632,17 @@ function vueReglages() {
       <div class="section-titre">Destinataire du mail</div>
       <input id="reglage-email" class="champ-reglage" type="email" value="${esc(R.email)}" data-i="email" placeholder="adresse@bibliotheque.fr" autocomplete="email">
       <div class="note">Enregistrée sur ce téléphone uniquement.</div>
+    </div>
+    <div class="section">
+      <div class="section-titre">Boîte de dépôt Biblio' Achats</div>
+      <label class="lib-champ" for="depot-url">Adresse de la boîte</label>
+      <input id="depot-url" class="champ-reglage champ-url" type="url" value="${esc(R.depotUrl)}" data-i="depotUrl" placeholder="https://biblio-achats.netlify.app" autocomplete="off">
+      <label class="lib-champ" for="depot-code">Code de dépôt</label>
+      <input id="depot-code" class="champ-reglage" type="password" value="${esc(R.depotCode)}" data-i="depotCode" autocomplete="off">
+      <label class="lib-champ" for="depot-par">Votre nom (« Recommandé par » dans le vivier)</label>
+      <input id="depot-par" class="champ-reglage" value="${esc(R.depotPar)}" data-i="depotPar" maxlength="60" autocomplete="off">
+      <div class="note">Facultatif. Réglée, « Envoyer » dépose les livres directement dans Biblio' Achats, qui les relève à son ouverture ; le mail reste possible. Le code permet seulement de déposer, jamais de lire.</div>
+      <div class="test-ligne"><button class="btn-test" data-a="testerDepot">Tester la boîte</button><div id="etat-depot" class="etat-test ${dCls}">${esc(dTxt)}</div></div>
     </div>
     <div class="section">
       <div class="section-titre">Vérifier le fonds (PMB)</div>
@@ -603,7 +690,7 @@ function vueReglages() {
       }).join("")}</div>
       <div class="note">Les listes de choix se modifient dans le fichier config.js.</div>
     </div>
-    <div class="note">${n} livre${pl(n)} enregistré${pl(n)} sur le téléphone · aucun compte, aucun serveur.</div>
+    <div class="note">${n} livre${pl(n)} enregistré${pl(n)} sur le téléphone · aucun compte${depotRegle() ? " · seuls les livres déposés partent vers la boîte" : ", aucun serveur"}.</div>
     <div class="note">Biblio' Veille ${VERSION_APP}</div>
   </div></div>`;
 }
@@ -726,7 +813,11 @@ function vueEnvoi(f) {
   const { hits, eff } = livresEnvoi(f);
   const n = eff.length;
   const html = R.formatMail !== "text";
-  let h = `<div class="f-titre">Envoyer ${n} livre${pl(n)}</div><div class="f-texte">À : ${esc(R.email || "(destinataire à renseigner dans Réglages)")}</div>`;
+  const depot = depotRegle();
+  const mail = !depot || f.voirMail;
+  let h = `<div class="f-titre">Envoyer ${n} livre${pl(n)}</div><div class="f-texte">${
+    mail ? `À : ${esc(R.email || "(destinataire à renseigner dans Réglages)")}` : "Dans la boîte de dépôt de Biblio' Achats, relevée à son ouverture sur le poste"
+  }</div>`;
   if (f.fonds || hits.length) {
     const titre =
       f.fonds === "checking" ? "Vérification du fonds PMB…"
@@ -740,6 +831,15 @@ function vueEnvoi(f) {
       h += `<button class="case-ligne" data-a="exclureFonds">${caseHtml(f.exclure)}Les retirer de cet envoi</button>`;
     }
     h += `</div>`;
+  }
+  if (depot && !f.voirMail) {
+    const occupe = f.fonds === "checking" || !n || f.depot === "encours";
+    h += `<button class="btn btn-pri" data-a="deposerAchats" ${occupe ? "disabled" : ""}>${
+      f.fonds === "checking" ? "Vérification…" : f.depot === "encours" ? "Dépôt en cours…" : `Déposer dans Biblio’ Achats (${n})`
+    }</button>`;
+    if (f.depotErreur) h += `<div class="note" role="alert" style="color:var(--err)">${esc(f.depotErreur)}</div>`;
+    h += `<button class="btn-lien" style="min-height:44px" data-a="voirMail">Envoyer plutôt par mail</button>`;
+    return h;
   }
   h += `<div class="segments" style="grid-template-columns:1fr 1fr">${seg(html, "formatMail", "Tableau HTML", 'data-v="html"')}${seg(!html, "formatMail", "Texte simple", 'data-v="text"')}</div>`;
 
@@ -1416,6 +1516,18 @@ const ACTIONS = {
     return false;
   },
   partager: () => (partager(), false),
+  deposerAchats: () => (deposerAchats(), false),
+  voirMail: () => {
+    E.feuille.voirMail = true;
+    renderFeuille();
+    return false;
+  },
+  testerDepot: async () => {
+    E.depotEtat = "testing";
+    render();
+    E.depotEtat = await testerDepot();
+    if (E.ecran === "reglages") render();
+  },
   confirmerEnvoi: () => {
     const ids = E.feuille.ids;
     for (const id of ids) maj(id, (l) => ((l.sent = true), (l.sentAt = Date.now())));
@@ -1629,6 +1741,14 @@ document.addEventListener("input", (e) => {
   } else if (i === "email") {
     R.email = el.value.trim();
     sauverR();
+  } else if (i === "depotUrl" || i === "depotCode" || i === "depotPar") {
+    R[i] = el.value.trim();
+    sauverR();
+    E.depotEtat = "idle";
+    const [t, cls] = texteDepot();
+    const etat = $("etat-depot");
+    etat.textContent = t;
+    etat.className = "etat-test " + cls;
   } else if (i === "pmbUrl") {
     R.pmbUrl = el.value.trim();
     sauverR();

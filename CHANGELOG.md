@@ -14,6 +14,17 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.9.0] - 2026-11-07
+
+### Ajouté
+- **Boîte de dépôt de Biblio' Achats** (vague 2 du portage en ligne d'Achats) : section de Réglages
+  facultative (adresse, code de dépôt, nom pour « Recommandé par », bouton « Tester la boîte »). Réglée,
+  « Envoyer » propose « Déposer dans Biblio' Achats » : les livres partent directement dans la boîte en
+  ligne, par paquets de 50, et sont marqués « envoyé » paquet par paquet. Achats les relève à son
+  ouverture sur le poste, sans passer par Outlook.
+- Le mail reste possible (« Envoyer plutôt par mail ») et reste la voie par défaut, boîte non réglée :
+  c'est celle des autres bibliothèques. Le code reste sur le téléphone ; il permet seulement de déposer.
+
 ## [1.8.0] - 2026-11-02
 
 ### Modifié

@@ -133,6 +133,7 @@ function chargerReglages() {
     email: localStorage.getItem("veille-isbn:destinataire") || "",
     pmbUrl: "", fondsMode: "both", theme: null, favs,
     groupe: "none", formatMail: "html", afficherEnvoyes: false,
+    depotUrl: "", depotCode: "", depotPar: "",
     ...r,
     sources: sourcesReglees(r.sources),
   };
