@@ -12,6 +12,10 @@ const ev = async (e) => (await env("Runtime.evaluate", { expression: e, returnBy
 const ok = (nom, c, d = "") => res.push([c, nom, d]);
 const lecture = async () => (await (await fetch("http://localhost:8775/api/depots", { headers: { "X-Code": "essai-lecture-1" } })).json()).depots;
 await env("Runtime.enable"); await env("Page.enable"); await env("Page.setBypassCSP", { enabled: true }); // la CSP de Veille n'admet que https, le service local est en http
+// Instantané d'essai : le premier livre est déjà au vivier (Commandé), un autre a été désherbé.
+await fetch("http://localhost:8775/api/instantane", { method: "POST", headers: { "X-Code": "essai-lecture-1", "Content-Type": "application/json" },
+  body: JSON.stringify({ genere: new Date().toISOString(), bons: [], budget: null, titres: [{ id: 1, titre: "Œuvres", isbn: "9782070360024", statut: "Commandé", session: "Octobre" }],
+    references: { catalogue: { notices: [] }, desherbe: { documents: [["9782350007472", "120 ans plus tard", "", "2021", "Pilon"]] } } }) });
 await env("Page.navigate", { url: "http://127.0.0.1:8798/index.html" }); await pause(1500);
 // Deux livres, dont un avec accents ; boîte non réglée d'abord.
 await ev(`livres.push(nouveauLivre("9782070360024",{prio:3,fields:{titre:"Œuvres complètes, tome 1",auteur:"Émile Zola",prix:"22,50 €"}}), nouveauLivre("",{fields:{titre:"Sans ISBN, à voir"}})); sauver(); render(); true`);
@@ -28,6 +32,8 @@ ok("test : bon code accepté", /accepté/.test(await ev(`document.getElementById
 ok("réglages enregistrés", await ev(`JSON.parse(localStorage.getItem(CLE_REGLAGES)).depotCode==='essai-depot-12'`));
 await ev(`document.querySelector('[data-a="liste"]').click()`); await pause(300);
 await ev(`document.querySelector('[data-a="envoyer"]').click()`); await pause(600);
+ok("déjà connu : encart dans l'envoi", /1 livre déjà connu de Biblio' Achats[\s\S]*Au vivier · Commandé/.test(await ev(`document.getElementById('feuille').textContent`)), await ev(`document.getElementById('feuille').textContent.slice(0,400)`));
+ok("déjà connu : pastille dans la liste", /Au vivier · Commandé/.test(await ev(`document.getElementById('app').textContent`)));
 ok("boîte réglée : bouton Déposer, mail en second", await ev(`/Déposer dans Biblio’ Achats \\(2\\)/.test(document.querySelector('[data-a="deposerAchats"]').textContent) && !!document.querySelector('[data-a="voirMail"]') && !document.querySelector('[data-a="partager"]')`));
 await ev(`document.querySelector('[data-a="voirMail"]').click()`); await pause(400);
 ok("« Envoyer plutôt par mail » montre le mail", await ev(`!!document.querySelector('[data-a="partager"]')`));
@@ -42,6 +48,8 @@ ok("panneau fermé", await ev(`E.feuille===null`));
 await ev(`livres.push(nouveauLivre("",{fields:{titre:"Troisième"}})); sauver(); R.depotUrl="http://localhost:8771"; sauverR(); render(); document.querySelector('[data-a="envoyer"]').click()`); await pause(500);
 await ev(`document.querySelector('[data-a="deposerAchats"]').click()`); await pause(1500);
 ok("boîte injoignable : erreur affichée, livre non marqué", /injoignable/.test(await ev(`document.getElementById('feuille').textContent`)) && await ev(`!livres.find(l=>l.fields.titre==="Troisième").sent`));
+await ev(`R.depotUrl="http://localhost:8775"; sauverR(); E.feuille=null; (()=>{const l=nouveauLivre("9782350007472");livres.push(l);sauver();verifierFondsAuScan(l,()=>{});})(); render(); true`); await pause(1200);
+ok("livre désherbé ajouté : pastille « Désherbé en 2021 »", /Désherbé en 2021/.test(await ev(`document.getElementById('app').textContent`)));
 ok("aucune erreur de page", !err.length, err.join(" | "));
 await fetch("http://localhost:8775/api/acquitter", { method: "POST", headers: { "X-Code": "essai-lecture-1", "Content-Type": "application/json" }, body: JSON.stringify({ ids: d.map((x) => x.id) }) });
 for (const [c, nom, dd] of res) console.log((c ? "ok    " : "ÉCHEC ") + nom + (c || !dd ? "" : "  → " + dd));

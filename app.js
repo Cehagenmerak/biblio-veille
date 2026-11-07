@@ -318,7 +318,7 @@ function vueLigne(l) {
       ${sous ? `<div class="ligne-sous">${esc(sous)}</div>` : ""}
       <div class="ligne-meta">${barresPrio(l.prio)}${l.prio === 3 ? `<span class="tag-indisp">Indispensable</span>` : ""}<span class="mono">${esc(meta)}</span></div>
     </div>
-    <div class="ligne-etats">${puceBnf(l.bnf, null, l.bnfSource)}${l.fonds ? `<span class="puce puce-fonds">Au fonds</span>` : ""}${l.sent ? `<span class="envoye">envoyé</span>` : ""}</div>
+    <div class="ligne-etats">${puceBnf(l.bnf, null, l.bnfSource)}${l.fonds ? `<span class="puce puce-fonds">Au fonds</span>` : !l.fonds && l.connu?.catalogue ? `<span class="puce puce-fonds">Au catalogue</span>` : ""}${connuAchats(l) ? `<span class="puce puce-connu">${esc(texteConnu(l.connu))}</span>` : ""}${l.sent ? `<span class="envoye">envoyé</span>` : ""}</div>
   </div></div>`;
 }
 
@@ -578,6 +578,48 @@ async function testerDepot() {
   }
 }
 
+// « Déjà connu d'Achats ? » : déjà au vivier (avec son statut), désherbé, ou au catalogue, d'après
+// l'instantané qu'Achats publie. Le code de dépôt suffit ; seuls le statut et la session sortent.
+async function verifierConnu(isbns) {
+  if (!depotRegle() || !isbns.length || !navigator.onLine) return null;
+  try {
+    const r = await fetch(urlDepot("/api/connu"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Code": R.depotCode.trim() },
+      body: JSON.stringify({ isbns }),
+    });
+    return r.ok ? (await r.json()).resultats || null : null;
+  } catch {
+    return null;
+  }
+}
+// Le catalogue seul est déjà dit par « Au fonds » quand PMB est réglé.
+const connuAchats = (l) => !!(l.connu && (l.connu.vivier || l.connu.desherbe));
+function texteConnu(c) {
+  if (c?.vivier) return `Au vivier · ${c.vivier.statut}`;
+  if (c?.desherbe) return `Désherbé${c.desherbe.annee ? ` en ${c.desherbe.annee}` : ""}`;
+  return "";
+}
+function verifierConnuAuScan(l) {
+  if (!l.isbn) return;
+  verifierConnu([l.isbn]).then((res) => {
+    if (!res || !livre(l.id)) return;
+    maj(l.id, (x) => (x.connu = res[l.isbn] || {}));
+    if (!S.actif) render();
+  });
+}
+// À l'ouverture de l'envoi : les livres pas encore vérifiés, par paquets de 100.
+async function completerConnus(f) {
+  const aVoir = livres.filter((l) => f.ids.includes(l.id) && l.isbn && l.connu === undefined);
+  for (let i = 0; i < aVoir.length; i += 100) {
+    const paquet = aVoir.slice(i, i + 100);
+    const res = await verifierConnu(paquet.map((l) => l.isbn));
+    if (!res) return;
+    for (const l of paquet) maj(l.id, (x) => (x.connu = res[l.isbn] || {}));
+  }
+  render(); // la liste (pastilles) et l'encart de l'envoi
+}
+
 // Dépose par paquets de 50 ; chaque paquet accepté est marqué « envoyé » aussitôt.
 async function deposerAchats() {
   const f = E.feuille;
@@ -805,12 +847,13 @@ function livresEnvoi(f) {
   const tous = livres.filter((l) => f.ids.includes(l.id));
   const verifie = f.fonds !== "checking";
   const hits = verifie ? tous.filter((l) => l.fonds) : [];
-  const eff = (f.exclure && hits.length ? tous.filter((l) => !l.fonds) : tous).sort((a, b) => b.prio - a.prio || b.ts - a.ts);
-  return { hits, eff };
+  const connus = tous.filter(connuAchats);
+  const eff = tous.filter((l) => !(f.exclure && l.fonds && verifie) && !(f.exclureConnus && connuAchats(l))).sort((a, b) => b.prio - a.prio || b.ts - a.ts);
+  return { hits, connus, eff };
 }
 
 function vueEnvoi(f) {
-  const { hits, eff } = livresEnvoi(f);
+  const { hits, connus, eff } = livresEnvoi(f);
   const n = eff.length;
   const html = R.formatMail !== "text";
   const depot = depotRegle();
@@ -831,6 +874,12 @@ function vueEnvoi(f) {
       h += `<button class="case-ligne" data-a="exclureFonds">${caseHtml(f.exclure)}Les retirer de cet envoi</button>`;
     }
     h += `</div>`;
+  }
+  if (connus.length) {
+    h += `<div class="fonds-bloc"><div class="fonds-titre" style="color:var(--warn)">${connus.length} livre${pl(connus.length)} déjà connu${pl(connus.length)} de Biblio' Achats</div>${connus
+      .map((l) => `<div class="fonds-hit"><span>${esc(l.fields.titre || formaterIsbn(l.isbn))}</span><span>${esc(texteConnu(l.connu))}</span></div>`).join("")}
+      <button class="case-ligne" data-a="exclureConnus">${caseHtml(!!f.exclureConnus)}Les retirer de cet envoi</button>
+      <div class="note">Renvoyé, un titre déjà au vivier y gagne seulement une voix de plus.</div></div>`;
   }
   if (depot && !f.voirMail) {
     const occupe = f.fonds === "checking" || !n || f.depot === "encours";
@@ -907,8 +956,9 @@ async function ouvrirEnvoi() {
   const ids = E.sel && E.sel.size ? [...E.sel] : tous.filter((l) => !l.sent).map((l) => l.id);
   if (!ids.length) return toast("Rien à envoyer");
   const verifier = !!R.pmbUrl.trim() && ["send", "both"].includes(R.fondsMode);
-  const f = (E.feuille = { type: "envoi", ids, fonds: verifier ? "checking" : null, exclure: true });
+  const f = (E.feuille = { type: "envoi", ids, fonds: verifier ? "checking" : null, exclure: true, exclureConnus: false });
   render();
+  completerConnus(f);
   if (!verifier) return preparerDocument();
   if (!navigator.onLine) {
     f.fonds = "error";
@@ -1035,6 +1085,7 @@ function fondsAuScan() {
 }
 
 function verifierFondsAuScan(l, siAuFonds) {
+  verifierConnuAuScan(l);
   if (!fondsAuScan() || !l.isbn) return;
   verifierFonds(R.pmbUrl.trim(), l.isbn).then((r) => {
     if (!r || !livre(l.id)) return;
@@ -1502,6 +1553,11 @@ const ACTIONS = {
     S.dernierLu = null;
     if (S.mode === "pile") S.mode = "unit";
     lectureIsbn(s);
+    return false;
+  },
+  exclureConnus: () => {
+    E.feuille.exclureConnus = !E.feuille.exclureConnus;
+    preparerDocument();
     return false;
   },
   exclureFonds: () => {

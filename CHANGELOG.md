@@ -14,6 +14,15 @@ Réglages. Chaque version publiée porte une étiquette Git `vX.Y.Z`.
 1.0.0. Les versions précédentes, numérotées v1 à v14 (v11 à v14 les 18 octobre), sont reprises
 dans cette 1.0.0 ; les anciens messages de commit gardent leurs numéros « vN ».
 
+## [1.10.0] - 2026-11-08
+
+### Ajouté
+- **« Déjà connu de Biblio' Achats »** (vague 4 du portage en ligne d'Achats), quand la boîte de dépôt est
+  réglée : à chaque ajout, Veille demande à la boîte si l'ISBN est déjà au vivier (avec son statut), a été
+  désherbé, ou figure au catalogue, d'après l'instantané qu'Achats publie. Pastilles « Au vivier · Commandé »,
+  « Désherbé en 2021 », « Au catalogue » (si PMB n'est pas réglé). L'envoi liste les livres déjà connus et
+  propose de les retirer. Seuls le statut et la session sortent de la boîte, jamais de nom ni de montant.
+
 ## [1.9.0] - 2026-11-07
 
 ### Ajouté
