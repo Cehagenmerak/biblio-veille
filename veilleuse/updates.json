@@ -11,6 +11,11 @@
           "version": "0.5.0",
           "update_link": "https://cehagenmerak.github.io/biblio-veille/veilleuse/biblio-veilleuse-0.5.0.xpi",
           "update_hash": "sha256:cc8807340a45b996e3b5db1bd015dd35395780d0b54b4c9a94a75e7cd978a230"
+        },
+        {
+          "version": "0.6.0",
+          "update_link": "https://cehagenmerak.github.io/biblio-veille/veilleuse/biblio-veilleuse-0.6.0.xpi",
+          "update_hash": "sha256:ae03e9964dbba3261073dff07cdf149ab087dccc56dd447843fe52762fb6bc3e"
         }
       ]
     }
